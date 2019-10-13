@@ -80,7 +80,8 @@ knitr::include_graphics("fig2matrix.png")
 dens_raster = create_densities(real_raster, race_raster, window_size = 10)
 
 ## ------------------------------------------------------------------------
-exposure_mat = comat::get_wecoma(x = real_raster[[1]], w = dens_raster[[1]])
+exposure_mat = comat::get_wecoma(x = as.matrix(real_raster[[1]]), 
+                                 w = as.matrix(dens_raster[[1]]))
 colnames(exposure_mat) = c("ASIAN", "BLACK", "HISPANIC", "OTHER", "WHITE")
 rownames(exposure_mat) = c("ASIAN", "BLACK", "HISPANIC", "OTHER", "WHITE")
 round(exposure_mat, 2)

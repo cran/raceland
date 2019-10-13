@@ -44,12 +44,15 @@ calculate_metrics = function(x, w, neighbourhood, fun, size = NULL, shift = NULL
   if (is.null(size)){
     size = 0
   }
-  if (missing(shift)){
+  if (is.null(shift)){
     shift = size
   }
   out = if (requireNamespace("pbapply", quietly = TRUE)){
-    pbapply::pbmapply(calculate_metric, raster::as.list(x), raster::as.list(w), neighbourhood = neighbourhood,
-                      fun = fun, size = size, na_action = na_action, base = base, ordered = ordered, threshold = threshold,
+    pbapply::pbmapply(calculate_metric, raster::as.list(x), raster::as.list(w),
+                      neighbourhood = neighbourhood, fun = fun,
+                      size = size, shift = shift,
+                      na_action = na_action, base = base,
+                      ordered = ordered, threshold = threshold,
                       SIMPLIFY = FALSE)
   } else {
     out = mapply(calculate_metric, raster::as.list(x), raster::as.list(w),
@@ -72,7 +75,7 @@ calculate_metric = function(x, w, neighbourhood, fun, size = NULL, shift = NULL,
   if (is.null(size)){
     size = 0
   }
-  if (missing(shift)){
+  if (is.null(shift)){
     shift = size
   }
   df_metrics = get_metrics(x = raster::as.matrix(x), w = raster::as.matrix(w),

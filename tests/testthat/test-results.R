@@ -23,5 +23,5 @@ popdens_raster2 = zones_to_raster(pop_vector, resolution = 30,
 expect_equal(real_raster2, real_raster)
 expect_equal(weig_raster2, weig_raster)
 expect_equal(metr_df2, metr_df)
-expect_equal(grid_sf2, grid_sf)
+expect_equivalent(grid_sf2, grid_sf)
 expect_equal(popdens_raster2, popdens_raster)

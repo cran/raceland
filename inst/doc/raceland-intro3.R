@@ -1,4 +1,4 @@
-## ---- include = FALSE----------------------------------------------------
+## ---- include = FALSE---------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -6,7 +6,7 @@ knitr::opts_chunk$set(
   fig.width = 6
 )
 
-## ---- echo = FALSE-------------------------------------------------------
+## ---- echo = FALSE------------------------------------------------------------
 df = data.frame(size = c("60", "120", "240", "480", "ALL"),
                 shift = c("30", "60", "120", "240", "ALL"),
                 n = c(2245,584,145,37,1),
@@ -16,13 +16,13 @@ df = data.frame(size = c("60", "120", "240", "480", "ALL"),
                 mutinf_sd = c(0.0051, 0.0036, 0.0027, 0.0019, 0.0009))
 knitr::kable(df, caption = "Table 1: Entropy and mutual information for different spatial scales")
 
-## ---- echo=FALSE, out.width = '40%', fig.cap="Figure 1: Racial landscape"----
+## ---- echo=FALSE, out.width = '40%', fig.cap="Figure 1: Racial landscape"-----
 knitr::include_graphics("racial_landscape.png")
 
 ## ---- echo=FALSE, out.width = '100%', fig.cap="Figure 2: Racial diversity and segregation at different spatial scales (an example for the scale of 1.8 km)"----
 knitr::include_graphics("div_seg.png")
 
-## ---- eval=FALSE---------------------------------------------------------
+## ---- eval=FALSE--------------------------------------------------------------
 #  # R script calculates IT-derived metrices for different spatial scales.
 #  
 #  # INSTALL REQUIRED PACKAGES

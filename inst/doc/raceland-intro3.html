@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -13,7 +12,7 @@
 
 <meta name="author" content="Anna Dmowska, Tomasz Stepinski, Jakub Nowosad" />
 
-<meta name="date" content="2019-10-13" />
+<meta name="date" content="2020-02-09" />
 
 <title>raceland: Describing local pattern of racial landscape using SocScape grids</title>
 
@@ -38,7 +37,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -304,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">raceland: Describing local pattern of racial landscape using SocScape grids</h1>
 <h4 class="author">Anna Dmowska, Tomasz Stepinski, Jakub Nowosad</h4>
-<h4 class="date">2019-10-13</h4>
+<h4 class="date">2020-02-09</h4>
 
 
 
@@ -434,306 +433,306 @@ Figure 2: Racial diversity and segregation at different spatial scales (an examp
 <div id="script-to-calculate-the-it-derived-metrics-for-different-spatial-scales" class="section level1">
 <h1>SCRIPT TO CALCULATE THE IT-DERIVED METRICS FOR DIFFERENT SPATIAL SCALES</h1>
 <p><em>Note: This calculation could take several minutes for larger counties.</em></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># R script calculates IT-derived metrices for different spatial scales. </span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co"># INSTALL REQUIRED PACKAGES </span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">pkgs =<span class="st"> </span><span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">  <span class="st">&quot;raceland&quot;</span>,                </a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">  <span class="st">&quot;comat&quot;</span>,            </a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">  <span class="st">&quot;rgdal&quot;</span>,   </a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">  <span class="st">&quot;raster&quot;</span>,</a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">  <span class="st">&quot;sf&quot;</span>,              </a>
-<a class="sourceLine" id="cb1-10" data-line-number="10">  <span class="st">&quot;dplyr&quot;</span>,</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">  <span class="st">&quot;RColorBrewer&quot;</span></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">)</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13">to_install =<span class="st"> </span><span class="op">!</span>pkgs <span class="op">%in%</span><span class="st"> </span><span class="kw">installed.packages</span>()</a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="cf">if</span>(<span class="kw">any</span>(to_install)) {</a>
-<a class="sourceLine" id="cb1-15" data-line-number="15">  <span class="kw">install.packages</span>(pkgs[to_install])</a>
-<a class="sourceLine" id="cb1-16" data-line-number="16">}</a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co"># REQUIRED R-PACKAGES</span></a>
-<a class="sourceLine" id="cb1-19" data-line-number="19"><span class="kw">library</span>(raceland)</a>
-<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="kw">library</span>(raster)</a>
-<a class="sourceLine" id="cb1-21" data-line-number="21"><span class="kw">library</span>(sf)</a>
-<a class="sourceLine" id="cb1-22" data-line-number="22"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb1-23" data-line-number="23"><span class="kw">library</span>(RColorBrewer)</a>
-<a class="sourceLine" id="cb1-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb1-25" data-line-number="25"><span class="co"># SET WORKING DIRECTORY</span></a>
-<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="co">## setwd(&quot;&quot;)</span></a>
-<a class="sourceLine" id="cb1-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb1-28" data-line-number="28"><span class="co">################################## USER DEFINED PARAMETERS #######################################</span></a>
-<a class="sourceLine" id="cb1-29" data-line-number="29"><span class="co"># Please define following parameters before running a script. </span></a>
-<a class="sourceLine" id="cb1-30" data-line-number="30"></a>
-<a class="sourceLine" id="cb1-31" data-line-number="31"><span class="co"># Path to race directory with downloaded data.</span></a>
-<a class="sourceLine" id="cb1-32" data-line-number="32">pf_to_data =<span class="st"> &quot;il_cook/race&quot;</span></a>
-<a class="sourceLine" id="cb1-33" data-line-number="33"></a>
-<a class="sourceLine" id="cb1-34" data-line-number="34"><span class="co"># sfx indicates which dataset will be used. There are 3 options: </span></a>
-<a class="sourceLine" id="cb1-35" data-line-number="35"><span class="co">## sfx=&quot;1990myc&quot; - race specific grids for 1990 year.</span></a>
-<a class="sourceLine" id="cb1-36" data-line-number="36"><span class="co">## sfx=&quot;2000myc&quot; - race specific grids for 2000 year.</span></a>
-<a class="sourceLine" id="cb1-37" data-line-number="37"><span class="co">## sfx=&quot;2010myc&quot; - race specific grids for 2010 year.</span></a>
-<a class="sourceLine" id="cb1-38" data-line-number="38"></a>
-<a class="sourceLine" id="cb1-39" data-line-number="39">sfx =<span class="st"> &quot;2010myc&quot;</span></a>
-<a class="sourceLine" id="cb1-40" data-line-number="40"></a>
-<a class="sourceLine" id="cb1-41" data-line-number="41"><span class="co"># Number of realizations (racial landscape) to generate.</span></a>
-<a class="sourceLine" id="cb1-42" data-line-number="42"><span class="co"># It is recommended to generate at least 30 realizations. </span></a>
-<a class="sourceLine" id="cb1-43" data-line-number="43">nrealization =<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb1-44" data-line-number="44"></a>
-<a class="sourceLine" id="cb1-45" data-line-number="45"><span class="co"># list with size and shift parameters: list(c(size, shift), c(size, shift),...). </span></a>
-<a class="sourceLine" id="cb1-46" data-line-number="46"><span class="co"># In this case calculation will be performed for 4 different spatia scale:</span></a>
-<a class="sourceLine" id="cb1-47" data-line-number="47"><span class="co"># 1. c(60,30) - size = 60 local ladnscape from 60x60 cells window will be calculated, </span></a>
-<a class="sourceLine" id="cb1-48" data-line-number="48"><span class="co">#    it corresponds to the spatial scale of 1.8km (60 cells x 30m).</span></a>
-<a class="sourceLine" id="cb1-49" data-line-number="49"><span class="co"># 2. c(120,60) - corresponds to the scale of 3.6 km. </span></a>
-<a class="sourceLine" id="cb1-50" data-line-number="50"><span class="co"># 3. c(240,120) - corresponds to the scale of 7.2 km. </span></a>
-<a class="sourceLine" id="cb1-51" data-line-number="51"><span class="co"># 4. c(480, 240) - corresponds to the scale of 14.4 km. </span></a>
-<a class="sourceLine" id="cb1-52" data-line-number="52">list_size_shift =<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">60</span>,<span class="dv">30</span>), <span class="kw">c</span>(<span class="dv">120</span>,<span class="dv">60</span>), <span class="kw">c</span>(<span class="dv">240</span>,<span class="dv">120</span>), <span class="kw">c</span>(<span class="dv">480</span>, <span class="dv">240</span>))</a>
-<a class="sourceLine" id="cb1-53" data-line-number="53"></a>
-<a class="sourceLine" id="cb1-54" data-line-number="54"><span class="co">####################################################################################################</span></a>
-<a class="sourceLine" id="cb1-55" data-line-number="55"></a>
-<a class="sourceLine" id="cb1-56" data-line-number="56"><span class="co"># FUNCTION TO CALCULATE RACIAL SEGREGATION/DIVERSITY CLASSIFICATION</span></a>
-<a class="sourceLine" id="cb1-57" data-line-number="57">bivariate_classification =<span class="st"> </span><span class="cf">function</span>(entropy, mutual_information, n) {</a>
-<a class="sourceLine" id="cb1-58" data-line-number="58">  </a>
-<a class="sourceLine" id="cb1-59" data-line-number="59">  <span class="co"># max entropy is calculated as log2 from the number of race categories</span></a>
-<a class="sourceLine" id="cb1-60" data-line-number="60">  nent =<span class="st"> </span><span class="kw">log2</span>(n)</a>
-<a class="sourceLine" id="cb1-61" data-line-number="61">  </a>
-<a class="sourceLine" id="cb1-62" data-line-number="62">  <span class="co"># divide entropy values into 3 categories</span></a>
-<a class="sourceLine" id="cb1-63" data-line-number="63">  ent_cat =<span class="st"> </span><span class="kw">cut</span>(entropy, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.66</span>, <span class="fl">1.33</span>, nent), <span class="dt">labels =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), </a>
-<a class="sourceLine" id="cb1-64" data-line-number="64">                <span class="dt">include.lowest =</span> <span class="ot">TRUE</span>, <span class="dt">right =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-65" data-line-number="65">  ent_cat =<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">as.character</span>(ent_cat))</a>
-<a class="sourceLine" id="cb1-66" data-line-number="66">  </a>
-<a class="sourceLine" id="cb1-67" data-line-number="67">  <span class="co"># divide mutual information values into 3 categories</span></a>
-<a class="sourceLine" id="cb1-68" data-line-number="68">  mut_cat =<span class="st"> </span><span class="kw">cut</span>(mutual_information, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.33</span>, <span class="fl">0.66</span>, <span class="dv">1</span>), <span class="dt">labels =</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>), </a>
-<a class="sourceLine" id="cb1-69" data-line-number="69">                <span class="dt">include.lowest =</span> <span class="ot">TRUE</span>, <span class="dt">right =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-70" data-line-number="70">  mut_cat =<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">as.character</span>(mut_cat))</a>
-<a class="sourceLine" id="cb1-71" data-line-number="71">  </a>
-<a class="sourceLine" id="cb1-72" data-line-number="72">  <span class="co"># combine categories of entropy (measure of racial diversity) </span></a>
-<a class="sourceLine" id="cb1-73" data-line-number="73">  <span class="co"># and mutual information (measure of racial segregation) </span></a>
-<a class="sourceLine" id="cb1-74" data-line-number="74">  bivar_cls =<span class="st"> </span>mut_cat <span class="op">+</span><span class="st"> </span>ent_cat</a>
-<a class="sourceLine" id="cb1-75" data-line-number="75">  bivar_cls =<span class="st"> </span><span class="kw">as.factor</span>(bivar_cls)</a>
-<a class="sourceLine" id="cb1-76" data-line-number="76">  </a>
-<a class="sourceLine" id="cb1-77" data-line-number="77">  <span class="kw">return</span>(bivar_cls)</a>
-<a class="sourceLine" id="cb1-78" data-line-number="78">}</a>
-<a class="sourceLine" id="cb1-79" data-line-number="79"></a>
-<a class="sourceLine" id="cb1-80" data-line-number="80"><span class="co">####################################################################################################</span></a>
-<a class="sourceLine" id="cb1-81" data-line-number="81"></a>
-<a class="sourceLine" id="cb1-82" data-line-number="82"><span class="co"># COLORS USED FOR VISUALIZATION</span></a>
-<a class="sourceLine" id="cb1-83" data-line-number="83"><span class="co">## They corresponds to 5 racial categories: ASIAN, BLACK, HISPANIC, OTHER, WHITE</span></a>
-<a class="sourceLine" id="cb1-84" data-line-number="84">race_colors =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;#F16667&quot;</span>, <span class="st">&quot;#6EBE44&quot;</span>, <span class="st">&quot;#7E69AF&quot;</span>, <span class="st">&quot;#C77213&quot;</span>, <span class="st">&quot;#F8DF1D&quot;</span>)</a>
-<a class="sourceLine" id="cb1-85" data-line-number="85"></a>
-<a class="sourceLine" id="cb1-86" data-line-number="86"><span class="co">## Bivariate palette to display the racial segregation/diversity classification</span></a>
-<a class="sourceLine" id="cb1-87" data-line-number="87">bivariate_class_colors =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;11&quot;</span> =<span class="st"> &quot;#e8e8e8&quot;</span>, <span class="st">&quot;12&quot;</span> =<span class="st"> &quot;#e4acac&quot;</span>, <span class="st">&quot;13&quot;</span> =<span class="st"> &quot;#c85a5a&quot;</span>,</a>
-<a class="sourceLine" id="cb1-88" data-line-number="88">                           <span class="st">&quot;21&quot;</span> =<span class="st"> &quot;#b0d5df&quot;</span>, <span class="st">&quot;22&quot;</span> =<span class="st"> &quot;#ad9ea5&quot;</span>, <span class="st">&quot;23&quot;</span> =<span class="st"> &quot;#985356&quot;</span>,</a>
-<a class="sourceLine" id="cb1-89" data-line-number="89">                           <span class="st">&quot;31&quot;</span> =<span class="st"> &quot;#64acbe&quot;</span>, <span class="st">&quot;32&quot;</span> =<span class="st"> &quot;#627f8c&quot;</span>, <span class="st">&quot;33&quot;</span> =<span class="st"> &quot;#574249&quot;</span>)</a>
-<a class="sourceLine" id="cb1-90" data-line-number="90"></a>
-<a class="sourceLine" id="cb1-91" data-line-number="91"><span class="co">####################################################################################################</span></a>
-<a class="sourceLine" id="cb1-92" data-line-number="92"></a>
-<a class="sourceLine" id="cb1-93" data-line-number="93"><span class="co">################################## CREATE RESULTS DIRECTORY WITH SUBDIRECTORIES ####################</span></a>
-<a class="sourceLine" id="cb1-94" data-line-number="94"><span class="co"># results directory will be created as subdirectory in working directory</span></a>
-<a class="sourceLine" id="cb1-95" data-line-number="95">pf =<span class="st"> </span><span class="kw">getwd</span>()</a>
-<a class="sourceLine" id="cb1-96" data-line-number="96"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-97" data-line-number="97"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-98" data-line-number="98"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_metrics&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-99" data-line-number="99"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-100" data-line-number="100"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;shp&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-101" data-line-number="101"></a>
-<a class="sourceLine" id="cb1-102" data-line-number="102"><span class="co">###################################################################################################</span></a>
-<a class="sourceLine" id="cb1-103" data-line-number="103"></a>
-<a class="sourceLine" id="cb1-104" data-line-number="104"><span class="co">################################## PREPROCESS RACE-SPECIFIC DATA ##################################</span></a>
-<a class="sourceLine" id="cb1-105" data-line-number="105"><span class="co"># Read data from GeoTIFFs to a RasterStack object</span></a>
-<a class="sourceLine" id="cb1-106" data-line-number="106">list_raster =<span class="st"> </span><span class="kw">list.files</span>(pf_to_data, <span class="dt">pattern =</span> sfx, <span class="dt">full.names =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-107" data-line-number="107">race_raster =<span class="st"> </span><span class="kw">stack</span>(list_raster)</a>
-<a class="sourceLine" id="cb1-108" data-line-number="108"></a>
-<a class="sourceLine" id="cb1-109" data-line-number="109"><span class="co"># Rename raster layers</span></a>
-<a class="sourceLine" id="cb1-110" data-line-number="110">rnames =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">strsplit</span>(<span class="kw">names</span>(race_raster), <span class="st">&quot;_&quot;</span>), tail, <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb1-111" data-line-number="111">rnames =<span class="st"> </span><span class="kw">substr</span>(rnames, <span class="dv">1</span>, <span class="kw">nchar</span>(rnames) <span class="op">-</span><span class="st"> </span><span class="kw">nchar</span>(sfx))</a>
-<a class="sourceLine" id="cb1-112" data-line-number="112"></a>
-<a class="sourceLine" id="cb1-113" data-line-number="113">new_names =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">recode</span>(</a>
-<a class="sourceLine" id="cb1-114" data-line-number="114">  rnames,</a>
-<a class="sourceLine" id="cb1-115" data-line-number="115">  <span class="st">&quot;hispanic&quot;</span> =<span class="st"> &quot;hispanic&quot;</span>,</a>
-<a class="sourceLine" id="cb1-116" data-line-number="116">  <span class="st">&quot;nham&quot;</span> =<span class="st"> &quot;am&quot;</span>,</a>
-<a class="sourceLine" id="cb1-117" data-line-number="117">  <span class="st">&quot;nhas&quot;</span> =<span class="st"> &quot;asian&quot;</span>,</a>
-<a class="sourceLine" id="cb1-118" data-line-number="118">  <span class="st">&quot;nhb&quot;</span> =<span class="st"> &quot;black&quot;</span>,</a>
-<a class="sourceLine" id="cb1-119" data-line-number="119">  <span class="st">&quot;nhother&quot;</span> =<span class="st"> &quot;other&quot;</span>,</a>
-<a class="sourceLine" id="cb1-120" data-line-number="120">  <span class="st">&quot;nhpi&quot;</span> =<span class="st"> &quot;pi&quot;</span>,</a>
-<a class="sourceLine" id="cb1-121" data-line-number="121">  <span class="st">&quot;nhw&quot;</span> =<span class="st"> &quot;white&quot;</span></a>
-<a class="sourceLine" id="cb1-122" data-line-number="122">)</a>
-<a class="sourceLine" id="cb1-123" data-line-number="123"><span class="kw">names</span>(race_raster) =<span class="st"> </span>new_names</a>
-<a class="sourceLine" id="cb1-124" data-line-number="124"></a>
-<a class="sourceLine" id="cb1-125" data-line-number="125"><span class="co"># Reorder layers in RasterStack</span></a>
-<a class="sourceLine" id="cb1-126" data-line-number="126">race_raster =<span class="st"> </span><span class="kw">subset</span>(race_raster, <span class="kw">c</span>(<span class="st">&quot;asian&quot;</span>, <span class="st">&quot;am&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;hispanic&quot;</span>, <span class="st">&quot;other&quot;</span>, <span class="st">&quot;pi&quot;</span>, <span class="st">&quot;white&quot;</span>))</a>
-<a class="sourceLine" id="cb1-127" data-line-number="127"></a>
-<a class="sourceLine" id="cb1-128" data-line-number="128"><span class="co"># Combine race-specific categories (ASIAN=ASIAN+PI, OTHER=OTHER+AM). </span></a>
-<a class="sourceLine" id="cb1-129" data-line-number="129"><span class="co"># Please notice that pi category does not exist for 1990myc dataset.</span></a>
-<a class="sourceLine" id="cb1-130" data-line-number="130"><span class="cf">if</span> (sfx <span class="op">==</span><span class="st"> &quot;1990myc&quot;</span>) {</a>
-<a class="sourceLine" id="cb1-131" data-line-number="131">  race_raster[[<span class="st">&quot;other&quot;</span>]] =<span class="st"> </span>race_raster[[<span class="st">&quot;other&quot;</span>]] <span class="op">+</span><span class="st"> </span>race_raster[[<span class="st">&quot;am&quot;</span>]]</a>
-<a class="sourceLine" id="cb1-132" data-line-number="132">  race_raster =<span class="st"> </span><span class="kw">dropLayer</span>(race_raster, <span class="kw">c</span>(<span class="st">&quot;am&quot;</span>))</a>
-<a class="sourceLine" id="cb1-133" data-line-number="133">} <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb1-134" data-line-number="134">  race_raster[[<span class="st">&quot;other&quot;</span>]] =<span class="st"> </span>race_raster[[<span class="st">&quot;other&quot;</span>]] <span class="op">+</span><span class="st"> </span>race_raster[[<span class="st">&quot;am&quot;</span>]]</a>
-<a class="sourceLine" id="cb1-135" data-line-number="135">  race_raster[[<span class="st">&quot;asian&quot;</span>]] =<span class="st"> </span>race_raster[[<span class="st">&quot;asian&quot;</span>]] <span class="op">+</span><span class="st"> </span>race_raster[[<span class="st">&quot;pi&quot;</span>]]</a>
-<a class="sourceLine" id="cb1-136" data-line-number="136">  race_raster =<span class="st"> </span><span class="kw">dropLayer</span>(race_raster, <span class="kw">c</span>(<span class="st">&quot;am&quot;</span>, <span class="st">&quot;pi&quot;</span>))</a>
-<a class="sourceLine" id="cb1-137" data-line-number="137">}</a>
-<a class="sourceLine" id="cb1-138" data-line-number="138"></a>
-<a class="sourceLine" id="cb1-139" data-line-number="139"><span class="co"># race raster object contains 5 layers: </span></a>
-<a class="sourceLine" id="cb1-140" data-line-number="140"><span class="co"># asian, black, hispanic, other, white with subpolulation densities</span></a>
-<a class="sourceLine" id="cb1-141" data-line-number="141">race_raster</a>
-<a class="sourceLine" id="cb1-142" data-line-number="142"></a>
-<a class="sourceLine" id="cb1-143" data-line-number="143"><span class="co"># save race_raster to a rds file</span></a>
-<a class="sourceLine" id="cb1-144" data-line-number="144"><span class="kw">saveRDS</span>(race_raster, <span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>, <span class="st">&quot;race_raster.rds&quot;</span>))</a>
-<a class="sourceLine" id="cb1-145" data-line-number="145"></a>
-<a class="sourceLine" id="cb1-146" data-line-number="146"><span class="co">###################################################################################################</span></a>
-<a class="sourceLine" id="cb1-147" data-line-number="147"></a>
-<a class="sourceLine" id="cb1-148" data-line-number="148"><span class="co">################################## CONSTRUCTING RACIAL LANDSCAPE ##################################</span></a>
-<a class="sourceLine" id="cb1-149" data-line-number="149">real_raster =<span class="st"> </span><span class="kw">create_realizations</span>(race_raster, <span class="dt">n =</span> nrealization)</a>
-<a class="sourceLine" id="cb1-150" data-line-number="150"></a>
-<a class="sourceLine" id="cb1-151" data-line-number="151"><span class="co"># save real_raster object</span></a>
-<a class="sourceLine" id="cb1-152" data-line-number="152"><span class="kw">saveRDS</span>(real_raster, <span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>, <span class="st">&quot;real_rast.rds&quot;</span>))</a>
-<a class="sourceLine" id="cb1-153" data-line-number="153"></a>
-<a class="sourceLine" id="cb1-154" data-line-number="154"><span class="co"># plot racial landscape</span></a>
-<a class="sourceLine" id="cb1-155" data-line-number="155"><span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="st">&quot;racial_landscape.png&quot;</span>)) </a>
-<a class="sourceLine" id="cb1-156" data-line-number="156"><span class="kw">plot_realization</span>(<span class="dt">x =</span> real_raster[[<span class="dv">1</span>]], <span class="dt">y =</span> race_raster, <span class="dt">hex =</span> race_colors)</a>
-<a class="sourceLine" id="cb1-157" data-line-number="157"><span class="kw">dev.off</span>() </a>
-<a class="sourceLine" id="cb1-158" data-line-number="158"><span class="co">###################################################################################################</span></a>
-<a class="sourceLine" id="cb1-159" data-line-number="159"></a>
-<a class="sourceLine" id="cb1-160" data-line-number="160"><span class="co">################################## CALCULATE RACE-SPECIFIC DENSTITIES #############################</span></a>
-<a class="sourceLine" id="cb1-161" data-line-number="161">dens_raster =<span class="st"> </span><span class="kw">create_densities</span>(real_raster, race_raster, <span class="dt">window_size =</span> <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb1-162" data-line-number="162"></a>
-<a class="sourceLine" id="cb1-163" data-line-number="163"><span class="co"># save dens_raster object</span></a>
-<a class="sourceLine" id="cb1-164" data-line-number="164"><span class="kw">saveRDS</span>(dens_raster, <span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>, <span class="st">&quot;dens_rast.rds&quot;</span>))</a>
-<a class="sourceLine" id="cb1-165" data-line-number="165"><span class="co">###################################################################################################</span></a>
-<a class="sourceLine" id="cb1-166" data-line-number="166"></a>
-<a class="sourceLine" id="cb1-167" data-line-number="167"><span class="co">################################## CALCULATE METRICS FOR DIFFERENT SPATIAL SCALES ################</span></a>
-<a class="sourceLine" id="cb1-168" data-line-number="168"></a>
-<a class="sourceLine" id="cb1-169" data-line-number="169">complete_smr_df =<span class="st"> </span><span class="kw">data.frame</span>()</a>
-<a class="sourceLine" id="cb1-170" data-line-number="170"><span class="cf">for</span> (i <span class="cf">in</span> list_size_shift) { <span class="co">#start size loop</span></a>
-<a class="sourceLine" id="cb1-171" data-line-number="171">  size =<span class="st"> </span>i[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb1-172" data-line-number="172">  shift =<span class="st"> </span>i[<span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb1-173" data-line-number="173">  </a>
-<a class="sourceLine" id="cb1-174" data-line-number="174">  <span class="co">#######################CALCULATE METRICS FOR SPECIFIED SIZE/SHIFT PARAMETER######################</span></a>
-<a class="sourceLine" id="cb1-175" data-line-number="175">  metr_df =<span class="st"> </span><span class="kw">calculate_metrics</span>(real_raster, dens_raster,</a>
-<a class="sourceLine" id="cb1-176" data-line-number="176">                              <span class="dt">neighbourhood =</span> <span class="dv">4</span>, <span class="dt">fun =</span> <span class="st">&quot;mean&quot;</span>,</a>
-<a class="sourceLine" id="cb1-177" data-line-number="177">                              <span class="dt">size =</span> size, <span class="dt">shift =</span> shift, <span class="dt">threshold =</span> <span class="fl">0.5</span>)</a>
-<a class="sourceLine" id="cb1-178" data-line-number="178">  </a>
-<a class="sourceLine" id="cb1-179" data-line-number="179">  <span class="co"># Summarize metrics</span></a>
-<a class="sourceLine" id="cb1-180" data-line-number="180">  <span class="co">## Number of motifels at given spatial scale</span></a>
-<a class="sourceLine" id="cb1-181" data-line-number="181">  sel =<span class="st"> </span>metr_df[<span class="op">!</span><span class="kw">is.na</span>(metr_df<span class="op">$</span>ent), ]</a>
-<a class="sourceLine" id="cb1-182" data-line-number="182">  nmotif =<span class="st"> </span><span class="kw">mean</span>(<span class="kw">table</span>(sel<span class="op">$</span>realization))</a>
-<a class="sourceLine" id="cb1-183" data-line-number="183">  </a>
-<a class="sourceLine" id="cb1-184" data-line-number="184">  <span class="co"># Metrics summary</span></a>
-<a class="sourceLine" id="cb1-185" data-line-number="185">  smr =<span class="st"> </span>metr_df <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-186" data-line-number="186"><span class="st">    </span><span class="kw">group_by</span>(row, col) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-187" data-line-number="187"><span class="st">    </span><span class="kw">summarize</span>(</a>
-<a class="sourceLine" id="cb1-188" data-line-number="188">      <span class="dt">ent_mean =</span> <span class="kw">mean</span>(ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-189" data-line-number="189">      <span class="dt">ent_sd =</span> <span class="kw">sd</span>(ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-190" data-line-number="190">      <span class="dt">mutinf_mean =</span> <span class="kw">mean</span>(mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-191" data-line-number="191">      <span class="dt">mutinf_sd =</span> <span class="kw">sd</span>(mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-192" data-line-number="192">    )</a>
-<a class="sourceLine" id="cb1-193" data-line-number="193">  </a>
-<a class="sourceLine" id="cb1-194" data-line-number="194">  smr =<span class="st"> </span><span class="kw">as.data.frame</span>(smr)</a>
-<a class="sourceLine" id="cb1-195" data-line-number="195"></a>
-<a class="sourceLine" id="cb1-196" data-line-number="196">  <span class="co"># Calculate an ensemble average for entropy and mutual information</span></a>
-<a class="sourceLine" id="cb1-197" data-line-number="197">  complete_smr =<span class="st"> </span><span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb1-198" data-line-number="198">    <span class="dt">size =</span> size,</a>
-<a class="sourceLine" id="cb1-199" data-line-number="199">    <span class="dt">shift =</span> shift,</a>
-<a class="sourceLine" id="cb1-200" data-line-number="200">    <span class="dt">n =</span> nmotif,</a>
-<a class="sourceLine" id="cb1-201" data-line-number="201">    <span class="dt">ent =</span> <span class="kw">mean</span>(smr<span class="op">$</span>ent_mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-202" data-line-number="202">    <span class="dt">ent_sd =</span> <span class="kw">mean</span>(smr<span class="op">$</span>ent_sd, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-203" data-line-number="203">    <span class="dt">mutinf =</span> <span class="kw">mean</span>(smr<span class="op">$</span>mutinf_mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-204" data-line-number="204">    <span class="dt">mutinf_sd =</span> <span class="kw">mean</span>(smr<span class="op">$</span>mutinf_sd, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-205" data-line-number="205">  )</a>
-<a class="sourceLine" id="cb1-206" data-line-number="206">  complete_smr_df =<span class="st"> </span><span class="kw">rbind</span>(complete_smr_df, complete_smr)</a>
-<a class="sourceLine" id="cb1-207" data-line-number="207">  </a>
-<a class="sourceLine" id="cb1-208" data-line-number="208">  <span class="co"># Calculate racial segregation/diversity classification</span></a>
-<a class="sourceLine" id="cb1-209" data-line-number="209">  smr<span class="op">$</span>bivar_cls =<span class="st"> </span><span class="kw">bivariate_classification</span>(<span class="dt">entropy =</span> smr<span class="op">$</span>ent_mean, </a>
-<a class="sourceLine" id="cb1-210" data-line-number="210">                                           <span class="dt">mutual_information =</span> smr<span class="op">$</span>mutinf_mean,</a>
-<a class="sourceLine" id="cb1-211" data-line-number="211">                                           <span class="dt">n =</span> <span class="kw">nlayers</span>(race_raster))</a>
-<a class="sourceLine" id="cb1-212" data-line-number="212">  </a>
-<a class="sourceLine" id="cb1-213" data-line-number="213">  <span class="co"># Save the metrics to csv</span></a>
-<a class="sourceLine" id="cb1-214" data-line-number="214">  <span class="kw">write.csv</span>(metr_df, </a>
-<a class="sourceLine" id="cb1-215" data-line-number="215">            <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_metrics&quot;</span>,</a>
-<a class="sourceLine" id="cb1-216" data-line-number="216">                      <span class="kw">paste</span>(<span class="st">&quot;metr_df_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)),</a>
-<a class="sourceLine" id="cb1-217" data-line-number="217">            <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-218" data-line-number="218">  <span class="kw">write.csv</span>(smr, </a>
-<a class="sourceLine" id="cb1-219" data-line-number="219">            <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_metrics&quot;</span>, </a>
-<a class="sourceLine" id="cb1-220" data-line-number="220">                      <span class="kw">paste</span>(<span class="st">&quot;smr_metr_df_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)),</a>
-<a class="sourceLine" id="cb1-221" data-line-number="221">            <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-222" data-line-number="222">  </a>
-<a class="sourceLine" id="cb1-223" data-line-number="223">  </a>
-<a class="sourceLine" id="cb1-224" data-line-number="224">  <span class="co">#######################CREATE SPATIAL OBJECT WITG METRICES######################</span></a>
-<a class="sourceLine" id="cb1-225" data-line-number="225">  </a>
-<a class="sourceLine" id="cb1-226" data-line-number="226">  <span class="co"># Create spatial object</span></a>
-<a class="sourceLine" id="cb1-227" data-line-number="227">  grid_sf =<span class="st"> </span><span class="kw">create_grid</span>(real_raster, <span class="dt">size =</span> size, <span class="dt">shift =</span> shift)</a>
-<a class="sourceLine" id="cb1-228" data-line-number="228">  </a>
-<a class="sourceLine" id="cb1-229" data-line-number="229">  <span class="co"># Join metrics to the grid</span></a>
-<a class="sourceLine" id="cb1-230" data-line-number="230">  attr_grid =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(grid_sf, smr, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;row&quot;</span>, <span class="st">&quot;col&quot;</span>))</a>
-<a class="sourceLine" id="cb1-231" data-line-number="231">  sel_grid =<span class="st"> </span>attr_grid[<span class="op">!</span><span class="kw">is.na</span>(attr_grid<span class="op">$</span>ent_mean),]</a>
-<a class="sourceLine" id="cb1-232" data-line-number="232">  </a>
-<a class="sourceLine" id="cb1-233" data-line-number="233">  <span class="co"># Save the grid as shapefile</span></a>
-<a class="sourceLine" id="cb1-234" data-line-number="234">  <span class="kw">st_write</span>(attr_grid, </a>
-<a class="sourceLine" id="cb1-235" data-line-number="235">           <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;shp&quot;</span>, </a>
-<a class="sourceLine" id="cb1-236" data-line-number="236">                     <span class="kw">paste</span>(<span class="st">&quot;metr_stat_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.shp&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)))</a>
-<a class="sourceLine" id="cb1-237" data-line-number="237">  </a>
-<a class="sourceLine" id="cb1-238" data-line-number="238">  <span class="co">#######################VISUALIZATION#########################################</span></a>
-<a class="sourceLine" id="cb1-239" data-line-number="239">  </a>
-<a class="sourceLine" id="cb1-240" data-line-number="240">  <span class="co"># Divide entropy values into 10 class</span></a>
-<a class="sourceLine" id="cb1-241" data-line-number="241">  ent_breaks =<span class="st"> </span><span class="kw">c</span>(<span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dt">by =</span> <span class="fl">0.25</span>), <span class="kw">log2</span>(<span class="kw">nlayers</span>(race_raster)))</a>
-<a class="sourceLine" id="cb1-242" data-line-number="242">  </a>
-<a class="sourceLine" id="cb1-243" data-line-number="243">  <span class="co"># Divide mutual information into 10 class</span></a>
-<a class="sourceLine" id="cb1-244" data-line-number="244">  mut_breaks =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">by =</span> <span class="fl">0.1</span>)</a>
-<a class="sourceLine" id="cb1-245" data-line-number="245">  </a>
-<a class="sourceLine" id="cb1-246" data-line-number="246">  <span class="co"># Spatial scale in km</span></a>
-<a class="sourceLine" id="cb1-247" data-line-number="247">  scale_km =<span class="st"> </span>(shift <span class="op">*</span><span class="st"> </span><span class="kw">res</span>(race_raster)[<span class="dv">1</span>]) <span class="op">/</span><span class="st"> </span><span class="dv">1000</span></a>
-<a class="sourceLine" id="cb1-248" data-line-number="248">  </a>
-<a class="sourceLine" id="cb1-249" data-line-number="249">  <span class="co"># Mapping racial diversity (save plot to .png)</span></a>
-<a class="sourceLine" id="cb1-250" data-line-number="250">  <span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="kw">paste</span>(<span class="st">&quot;diversity_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.png&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) </a>
-<a class="sourceLine" id="cb1-251" data-line-number="251">  <span class="kw">plot</span>(sel_grid[<span class="st">&quot;ent_mean&quot;</span>], <span class="dt">breaks =</span> ent_breaks, <span class="dt">key.pos =</span> <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-252" data-line-number="252">       <span class="dt">pal =</span> <span class="kw">rev</span>(<span class="kw">brewer.pal</span>(<span class="kw">length</span>(ent_breaks) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">name =</span> <span class="st">&quot;RdBu&quot;</span>)), <span class="dt">bty =</span> <span class="st">&quot;n&quot;</span>, </a>
-<a class="sourceLine" id="cb1-253" data-line-number="253">       <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;Racial diversity (Entropy) at the scale of &quot;</span>, </a>
-<a class="sourceLine" id="cb1-254" data-line-number="254">                    scale_km, <span class="st">&quot; km&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))</a>
-<a class="sourceLine" id="cb1-255" data-line-number="255">  <span class="kw">dev.off</span>() </a>
-<a class="sourceLine" id="cb1-256" data-line-number="256">  </a>
-<a class="sourceLine" id="cb1-257" data-line-number="257">  <span class="co"># Mapping racial segregation (save plot to .png)</span></a>
-<a class="sourceLine" id="cb1-258" data-line-number="258">  <span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="kw">paste</span>(<span class="st">&quot;segregation_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.png&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) </a>
-<a class="sourceLine" id="cb1-259" data-line-number="259">  <span class="kw">plot</span>(sel_grid[<span class="st">&quot;mutinf_mean&quot;</span>], <span class="dt">breaks =</span> mut_breaks, <span class="dt">key.pos =</span> <span class="dv">1</span>, </a>
-<a class="sourceLine" id="cb1-260" data-line-number="260">       <span class="dt">pal =</span> <span class="kw">rev</span>(<span class="kw">brewer.pal</span>(<span class="kw">length</span>(mut_breaks) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">name =</span> <span class="st">&quot;RdBu&quot;</span>)), <span class="dt">bty =</span> <span class="st">&quot;n&quot;</span>, </a>
-<a class="sourceLine" id="cb1-261" data-line-number="261">       <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;Racial segregation (Mutual information) at the scale of &quot;</span>,</a>
-<a class="sourceLine" id="cb1-262" data-line-number="262">                    scale_km, <span class="st">&quot; km&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))</a>
-<a class="sourceLine" id="cb1-263" data-line-number="263">  <span class="kw">dev.off</span>() </a>
-<a class="sourceLine" id="cb1-264" data-line-number="264">  </a>
-<a class="sourceLine" id="cb1-265" data-line-number="265">  <span class="co"># Mapping racial segregation/diversity (save plot to .png)</span></a>
-<a class="sourceLine" id="cb1-266" data-line-number="266">  <span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="kw">paste</span>(<span class="st">&quot;bivar_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.png&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)))   </a>
-<a class="sourceLine" id="cb1-267" data-line-number="267">  bcat =<span class="st"> </span>bivariate_class_colors[<span class="kw">names</span>(bivariate_class_colors)<span class="op">%in%</span><span class="kw">unique</span>(sel_grid<span class="op">$</span>bivar_cls)]</a>
-<a class="sourceLine" id="cb1-268" data-line-number="268">  <span class="kw">plot</span>(sel_grid[<span class="st">&quot;bivar_cls&quot;</span>], </a>
-<a class="sourceLine" id="cb1-269" data-line-number="269">       <span class="dt">pal =</span> bcat,</a>
-<a class="sourceLine" id="cb1-270" data-line-number="270">       <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;Racial diversity/segregation classification at the scale of &quot;</span>,</a>
-<a class="sourceLine" id="cb1-271" data-line-number="271">                     scale_km, <span class="st">&quot; km&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))</a>
-<a class="sourceLine" id="cb1-272" data-line-number="272">  <span class="kw">dev.off</span>() </a>
-<a class="sourceLine" id="cb1-273" data-line-number="273">} <span class="co">#stop size loop</span></a>
-<a class="sourceLine" id="cb1-274" data-line-number="274"></a>
-<a class="sourceLine" id="cb1-275" data-line-number="275"></a>
-<a class="sourceLine" id="cb1-276" data-line-number="276"><span class="co">###################################################################################################</span></a>
-<a class="sourceLine" id="cb1-277" data-line-number="277"></a>
-<a class="sourceLine" id="cb1-278" data-line-number="278"><span class="co">################################## CALCULATE METRICS FOR THE WHOLE RACIAL LANDSCAPE ###############</span></a>
-<a class="sourceLine" id="cb1-279" data-line-number="279"></a>
-<a class="sourceLine" id="cb1-280" data-line-number="280">metr =<span class="st"> </span><span class="kw">calculate_metrics</span>(real_raster, dens_raster,</a>
-<a class="sourceLine" id="cb1-281" data-line-number="281">                         <span class="dt">neighbourhood =</span> <span class="dv">4</span>, <span class="dt">fun =</span> <span class="st">&quot;mean&quot;</span>, </a>
-<a class="sourceLine" id="cb1-282" data-line-number="282">                         <span class="dt">size =</span> <span class="ot">NULL</span>, <span class="dt">threshold =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb1-283" data-line-number="283">complete_smr_all =<span class="st"> </span><span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb1-284" data-line-number="284">  <span class="dt">size =</span> <span class="st">&quot;ALL&quot;</span>,</a>
-<a class="sourceLine" id="cb1-285" data-line-number="285">  <span class="dt">shift =</span> <span class="st">&quot;ALL&quot;</span>,</a>
-<a class="sourceLine" id="cb1-286" data-line-number="286">  <span class="dt">n =</span> <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb1-287" data-line-number="287">  <span class="dt">ent =</span> <span class="kw">mean</span>(metr<span class="op">$</span>ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-288" data-line-number="288">  <span class="dt">ent_sd =</span> <span class="kw">sd</span>(metr<span class="op">$</span>ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-289" data-line-number="289">  <span class="dt">mutinf =</span> <span class="kw">mean</span>(metr<span class="op">$</span>mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
-<a class="sourceLine" id="cb1-290" data-line-number="290">  <span class="dt">mutinf_sd =</span> <span class="kw">sd</span>(metr<span class="op">$</span>mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb1-291" data-line-number="291">)</a>
-<a class="sourceLine" id="cb1-292" data-line-number="292">complete_smr_df =<span class="st"> </span><span class="kw">rbind</span>(complete_smr_df, complete_smr_all)</a>
-<a class="sourceLine" id="cb1-293" data-line-number="293"><span class="kw">colnames</span>(complete_smr_df) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;size&quot;</span>, <span class="st">&quot;shift&quot;</span>, <span class="st">&quot;n&quot;</span>, <span class="st">&quot;ent&quot;</span>, <span class="st">&quot;ent_sd&quot;</span>, <span class="st">&quot;mutinf&quot;</span>, <span class="st">&quot;mutinf_sd&quot;</span>)</a>
-<a class="sourceLine" id="cb1-294" data-line-number="294"></a>
-<a class="sourceLine" id="cb1-295" data-line-number="295"><span class="co"># Write table with metrices for different spatial scales and for the whole area. </span></a>
-<a class="sourceLine" id="cb1-296" data-line-number="296"><span class="kw">write.csv</span>(complete_smr_df,</a>
-<a class="sourceLine" id="cb1-297" data-line-number="297">          <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="st">&quot;complete_smr.csv&quot;</span>),</a>
-<a class="sourceLine" id="cb1-298" data-line-number="298">          <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb1-299" data-line-number="299"></a>
-<a class="sourceLine" id="cb1-300" data-line-number="300"><span class="co">###################################################################################################</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># R script calculates IT-derived metrices for different spatial scales. </span></a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="co"># INSTALL REQUIRED PACKAGES </span></a>
+<a class="sourceLine" id="cb1-4" title="4">pkgs =<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb1-5" title="5">  <span class="st">&quot;raceland&quot;</span>,                </a>
+<a class="sourceLine" id="cb1-6" title="6">  <span class="st">&quot;comat&quot;</span>,            </a>
+<a class="sourceLine" id="cb1-7" title="7">  <span class="st">&quot;rgdal&quot;</span>,   </a>
+<a class="sourceLine" id="cb1-8" title="8">  <span class="st">&quot;raster&quot;</span>,</a>
+<a class="sourceLine" id="cb1-9" title="9">  <span class="st">&quot;sf&quot;</span>,              </a>
+<a class="sourceLine" id="cb1-10" title="10">  <span class="st">&quot;dplyr&quot;</span>,</a>
+<a class="sourceLine" id="cb1-11" title="11">  <span class="st">&quot;RColorBrewer&quot;</span></a>
+<a class="sourceLine" id="cb1-12" title="12">)</a>
+<a class="sourceLine" id="cb1-13" title="13">to_install =<span class="st"> </span><span class="op">!</span>pkgs <span class="op">%in%</span><span class="st"> </span><span class="kw">installed.packages</span>()</a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="cf">if</span>(<span class="kw">any</span>(to_install)) {</a>
+<a class="sourceLine" id="cb1-15" title="15">  <span class="kw">install.packages</span>(pkgs[to_install])</a>
+<a class="sourceLine" id="cb1-16" title="16">}</a>
+<a class="sourceLine" id="cb1-17" title="17"></a>
+<a class="sourceLine" id="cb1-18" title="18"><span class="co"># REQUIRED R-PACKAGES</span></a>
+<a class="sourceLine" id="cb1-19" title="19"><span class="kw">library</span>(raceland)</a>
+<a class="sourceLine" id="cb1-20" title="20"><span class="kw">library</span>(raster)</a>
+<a class="sourceLine" id="cb1-21" title="21"><span class="kw">library</span>(sf)</a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb1-23" title="23"><span class="kw">library</span>(RColorBrewer)</a>
+<a class="sourceLine" id="cb1-24" title="24"></a>
+<a class="sourceLine" id="cb1-25" title="25"><span class="co"># SET WORKING DIRECTORY</span></a>
+<a class="sourceLine" id="cb1-26" title="26"><span class="co">## setwd(&quot;&quot;)</span></a>
+<a class="sourceLine" id="cb1-27" title="27"></a>
+<a class="sourceLine" id="cb1-28" title="28"><span class="co">################################## USER DEFINED PARAMETERS #######################################</span></a>
+<a class="sourceLine" id="cb1-29" title="29"><span class="co"># Please define following parameters before running a script. </span></a>
+<a class="sourceLine" id="cb1-30" title="30"></a>
+<a class="sourceLine" id="cb1-31" title="31"><span class="co"># Path to race directory with downloaded data.</span></a>
+<a class="sourceLine" id="cb1-32" title="32">pf_to_data =<span class="st"> &quot;il_cook/race&quot;</span></a>
+<a class="sourceLine" id="cb1-33" title="33"></a>
+<a class="sourceLine" id="cb1-34" title="34"><span class="co"># sfx indicates which dataset will be used. There are 3 options: </span></a>
+<a class="sourceLine" id="cb1-35" title="35"><span class="co">## sfx=&quot;1990myc&quot; - race specific grids for 1990 year.</span></a>
+<a class="sourceLine" id="cb1-36" title="36"><span class="co">## sfx=&quot;2000myc&quot; - race specific grids for 2000 year.</span></a>
+<a class="sourceLine" id="cb1-37" title="37"><span class="co">## sfx=&quot;2010myc&quot; - race specific grids for 2010 year.</span></a>
+<a class="sourceLine" id="cb1-38" title="38"></a>
+<a class="sourceLine" id="cb1-39" title="39">sfx =<span class="st"> &quot;2010myc&quot;</span></a>
+<a class="sourceLine" id="cb1-40" title="40"></a>
+<a class="sourceLine" id="cb1-41" title="41"><span class="co"># Number of realizations (racial landscape) to generate.</span></a>
+<a class="sourceLine" id="cb1-42" title="42"><span class="co"># It is recommended to generate at least 30 realizations. </span></a>
+<a class="sourceLine" id="cb1-43" title="43">nrealization =<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb1-44" title="44"></a>
+<a class="sourceLine" id="cb1-45" title="45"><span class="co"># list with size and shift parameters: list(c(size, shift), c(size, shift),...). </span></a>
+<a class="sourceLine" id="cb1-46" title="46"><span class="co"># In this case calculation will be performed for 4 different spatia scale:</span></a>
+<a class="sourceLine" id="cb1-47" title="47"><span class="co"># 1. c(60,30) - size = 60 local ladnscape from 60x60 cells window will be calculated, </span></a>
+<a class="sourceLine" id="cb1-48" title="48"><span class="co">#    it corresponds to the spatial scale of 1.8km (60 cells x 30m).</span></a>
+<a class="sourceLine" id="cb1-49" title="49"><span class="co"># 2. c(120,60) - corresponds to the scale of 3.6 km. </span></a>
+<a class="sourceLine" id="cb1-50" title="50"><span class="co"># 3. c(240,120) - corresponds to the scale of 7.2 km. </span></a>
+<a class="sourceLine" id="cb1-51" title="51"><span class="co"># 4. c(480, 240) - corresponds to the scale of 14.4 km. </span></a>
+<a class="sourceLine" id="cb1-52" title="52">list_size_shift =<span class="st"> </span><span class="kw">list</span>(<span class="kw">c</span>(<span class="dv">60</span>,<span class="dv">30</span>), <span class="kw">c</span>(<span class="dv">120</span>,<span class="dv">60</span>), <span class="kw">c</span>(<span class="dv">240</span>,<span class="dv">120</span>), <span class="kw">c</span>(<span class="dv">480</span>, <span class="dv">240</span>))</a>
+<a class="sourceLine" id="cb1-53" title="53"></a>
+<a class="sourceLine" id="cb1-54" title="54"><span class="co">####################################################################################################</span></a>
+<a class="sourceLine" id="cb1-55" title="55"></a>
+<a class="sourceLine" id="cb1-56" title="56"><span class="co"># FUNCTION TO CALCULATE RACIAL SEGREGATION/DIVERSITY CLASSIFICATION</span></a>
+<a class="sourceLine" id="cb1-57" title="57">bivariate_classification =<span class="st"> </span><span class="cf">function</span>(entropy, mutual_information, n) {</a>
+<a class="sourceLine" id="cb1-58" title="58">  </a>
+<a class="sourceLine" id="cb1-59" title="59">  <span class="co"># max entropy is calculated as log2 from the number of race categories</span></a>
+<a class="sourceLine" id="cb1-60" title="60">  nent =<span class="st"> </span><span class="kw">log2</span>(n)</a>
+<a class="sourceLine" id="cb1-61" title="61">  </a>
+<a class="sourceLine" id="cb1-62" title="62">  <span class="co"># divide entropy values into 3 categories</span></a>
+<a class="sourceLine" id="cb1-63" title="63">  ent_cat =<span class="st"> </span><span class="kw">cut</span>(entropy, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.66</span>, <span class="fl">1.33</span>, nent), <span class="dt">labels =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), </a>
+<a class="sourceLine" id="cb1-64" title="64">                <span class="dt">include.lowest =</span> <span class="ot">TRUE</span>, <span class="dt">right =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-65" title="65">  ent_cat =<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">as.character</span>(ent_cat))</a>
+<a class="sourceLine" id="cb1-66" title="66">  </a>
+<a class="sourceLine" id="cb1-67" title="67">  <span class="co"># divide mutual information values into 3 categories</span></a>
+<a class="sourceLine" id="cb1-68" title="68">  mut_cat =<span class="st"> </span><span class="kw">cut</span>(mutual_information, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.33</span>, <span class="fl">0.66</span>, <span class="dv">1</span>), <span class="dt">labels =</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>), </a>
+<a class="sourceLine" id="cb1-69" title="69">                <span class="dt">include.lowest =</span> <span class="ot">TRUE</span>, <span class="dt">right =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-70" title="70">  mut_cat =<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">as.character</span>(mut_cat))</a>
+<a class="sourceLine" id="cb1-71" title="71">  </a>
+<a class="sourceLine" id="cb1-72" title="72">  <span class="co"># combine categories of entropy (measure of racial diversity) </span></a>
+<a class="sourceLine" id="cb1-73" title="73">  <span class="co"># and mutual information (measure of racial segregation) </span></a>
+<a class="sourceLine" id="cb1-74" title="74">  bivar_cls =<span class="st"> </span>mut_cat <span class="op">+</span><span class="st"> </span>ent_cat</a>
+<a class="sourceLine" id="cb1-75" title="75">  bivar_cls =<span class="st"> </span><span class="kw">as.factor</span>(bivar_cls)</a>
+<a class="sourceLine" id="cb1-76" title="76">  </a>
+<a class="sourceLine" id="cb1-77" title="77">  <span class="kw">return</span>(bivar_cls)</a>
+<a class="sourceLine" id="cb1-78" title="78">}</a>
+<a class="sourceLine" id="cb1-79" title="79"></a>
+<a class="sourceLine" id="cb1-80" title="80"><span class="co">####################################################################################################</span></a>
+<a class="sourceLine" id="cb1-81" title="81"></a>
+<a class="sourceLine" id="cb1-82" title="82"><span class="co"># COLORS USED FOR VISUALIZATION</span></a>
+<a class="sourceLine" id="cb1-83" title="83"><span class="co">## They corresponds to 5 racial categories: ASIAN, BLACK, HISPANIC, OTHER, WHITE</span></a>
+<a class="sourceLine" id="cb1-84" title="84">race_colors =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;#F16667&quot;</span>, <span class="st">&quot;#6EBE44&quot;</span>, <span class="st">&quot;#7E69AF&quot;</span>, <span class="st">&quot;#C77213&quot;</span>, <span class="st">&quot;#F8DF1D&quot;</span>)</a>
+<a class="sourceLine" id="cb1-85" title="85"></a>
+<a class="sourceLine" id="cb1-86" title="86"><span class="co">## Bivariate palette to display the racial segregation/diversity classification</span></a>
+<a class="sourceLine" id="cb1-87" title="87">bivariate_class_colors =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;11&quot;</span> =<span class="st"> &quot;#e8e8e8&quot;</span>, <span class="st">&quot;12&quot;</span> =<span class="st"> &quot;#e4acac&quot;</span>, <span class="st">&quot;13&quot;</span> =<span class="st"> &quot;#c85a5a&quot;</span>,</a>
+<a class="sourceLine" id="cb1-88" title="88">                           <span class="st">&quot;21&quot;</span> =<span class="st"> &quot;#b0d5df&quot;</span>, <span class="st">&quot;22&quot;</span> =<span class="st"> &quot;#ad9ea5&quot;</span>, <span class="st">&quot;23&quot;</span> =<span class="st"> &quot;#985356&quot;</span>,</a>
+<a class="sourceLine" id="cb1-89" title="89">                           <span class="st">&quot;31&quot;</span> =<span class="st"> &quot;#64acbe&quot;</span>, <span class="st">&quot;32&quot;</span> =<span class="st"> &quot;#627f8c&quot;</span>, <span class="st">&quot;33&quot;</span> =<span class="st"> &quot;#574249&quot;</span>)</a>
+<a class="sourceLine" id="cb1-90" title="90"></a>
+<a class="sourceLine" id="cb1-91" title="91"><span class="co">####################################################################################################</span></a>
+<a class="sourceLine" id="cb1-92" title="92"></a>
+<a class="sourceLine" id="cb1-93" title="93"><span class="co">################################## CREATE RESULTS DIRECTORY WITH SUBDIRECTORIES ####################</span></a>
+<a class="sourceLine" id="cb1-94" title="94"><span class="co"># results directory will be created as subdirectory in working directory</span></a>
+<a class="sourceLine" id="cb1-95" title="95">pf =<span class="st"> </span><span class="kw">getwd</span>()</a>
+<a class="sourceLine" id="cb1-96" title="96"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-97" title="97"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-98" title="98"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_metrics&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-99" title="99"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-100" title="100"><span class="kw">dir.create</span>(<span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;shp&quot;</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-101" title="101"></a>
+<a class="sourceLine" id="cb1-102" title="102"><span class="co">###################################################################################################</span></a>
+<a class="sourceLine" id="cb1-103" title="103"></a>
+<a class="sourceLine" id="cb1-104" title="104"><span class="co">################################## PREPROCESS RACE-SPECIFIC DATA ##################################</span></a>
+<a class="sourceLine" id="cb1-105" title="105"><span class="co"># Read data from GeoTIFFs to a RasterStack object</span></a>
+<a class="sourceLine" id="cb1-106" title="106">list_raster =<span class="st"> </span><span class="kw">list.files</span>(pf_to_data, <span class="dt">pattern =</span> sfx, <span class="dt">full.names =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-107" title="107">race_raster =<span class="st"> </span><span class="kw">stack</span>(list_raster)</a>
+<a class="sourceLine" id="cb1-108" title="108"></a>
+<a class="sourceLine" id="cb1-109" title="109"><span class="co"># Rename raster layers</span></a>
+<a class="sourceLine" id="cb1-110" title="110">rnames =<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">strsplit</span>(<span class="kw">names</span>(race_raster), <span class="st">&quot;_&quot;</span>), tail, <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb1-111" title="111">rnames =<span class="st"> </span><span class="kw">substr</span>(rnames, <span class="dv">1</span>, <span class="kw">nchar</span>(rnames) <span class="op">-</span><span class="st"> </span><span class="kw">nchar</span>(sfx))</a>
+<a class="sourceLine" id="cb1-112" title="112"></a>
+<a class="sourceLine" id="cb1-113" title="113">new_names =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">recode</span>(</a>
+<a class="sourceLine" id="cb1-114" title="114">  rnames,</a>
+<a class="sourceLine" id="cb1-115" title="115">  <span class="st">&quot;hispanic&quot;</span> =<span class="st"> &quot;hispanic&quot;</span>,</a>
+<a class="sourceLine" id="cb1-116" title="116">  <span class="st">&quot;nham&quot;</span> =<span class="st"> &quot;am&quot;</span>,</a>
+<a class="sourceLine" id="cb1-117" title="117">  <span class="st">&quot;nhas&quot;</span> =<span class="st"> &quot;asian&quot;</span>,</a>
+<a class="sourceLine" id="cb1-118" title="118">  <span class="st">&quot;nhb&quot;</span> =<span class="st"> &quot;black&quot;</span>,</a>
+<a class="sourceLine" id="cb1-119" title="119">  <span class="st">&quot;nhother&quot;</span> =<span class="st"> &quot;other&quot;</span>,</a>
+<a class="sourceLine" id="cb1-120" title="120">  <span class="st">&quot;nhpi&quot;</span> =<span class="st"> &quot;pi&quot;</span>,</a>
+<a class="sourceLine" id="cb1-121" title="121">  <span class="st">&quot;nhw&quot;</span> =<span class="st"> &quot;white&quot;</span></a>
+<a class="sourceLine" id="cb1-122" title="122">)</a>
+<a class="sourceLine" id="cb1-123" title="123"><span class="kw">names</span>(race_raster) =<span class="st"> </span>new_names</a>
+<a class="sourceLine" id="cb1-124" title="124"></a>
+<a class="sourceLine" id="cb1-125" title="125"><span class="co"># Reorder layers in RasterStack</span></a>
+<a class="sourceLine" id="cb1-126" title="126">race_raster =<span class="st"> </span><span class="kw">subset</span>(race_raster, <span class="kw">c</span>(<span class="st">&quot;asian&quot;</span>, <span class="st">&quot;am&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;hispanic&quot;</span>, <span class="st">&quot;other&quot;</span>, <span class="st">&quot;pi&quot;</span>, <span class="st">&quot;white&quot;</span>))</a>
+<a class="sourceLine" id="cb1-127" title="127"></a>
+<a class="sourceLine" id="cb1-128" title="128"><span class="co"># Combine race-specific categories (ASIAN=ASIAN+PI, OTHER=OTHER+AM). </span></a>
+<a class="sourceLine" id="cb1-129" title="129"><span class="co"># Please notice that pi category does not exist for 1990myc dataset.</span></a>
+<a class="sourceLine" id="cb1-130" title="130"><span class="cf">if</span> (sfx <span class="op">==</span><span class="st"> &quot;1990myc&quot;</span>) {</a>
+<a class="sourceLine" id="cb1-131" title="131">  race_raster[[<span class="st">&quot;other&quot;</span>]] =<span class="st"> </span>race_raster[[<span class="st">&quot;other&quot;</span>]] <span class="op">+</span><span class="st"> </span>race_raster[[<span class="st">&quot;am&quot;</span>]]</a>
+<a class="sourceLine" id="cb1-132" title="132">  race_raster =<span class="st"> </span><span class="kw">dropLayer</span>(race_raster, <span class="kw">c</span>(<span class="st">&quot;am&quot;</span>))</a>
+<a class="sourceLine" id="cb1-133" title="133">} <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb1-134" title="134">  race_raster[[<span class="st">&quot;other&quot;</span>]] =<span class="st"> </span>race_raster[[<span class="st">&quot;other&quot;</span>]] <span class="op">+</span><span class="st"> </span>race_raster[[<span class="st">&quot;am&quot;</span>]]</a>
+<a class="sourceLine" id="cb1-135" title="135">  race_raster[[<span class="st">&quot;asian&quot;</span>]] =<span class="st"> </span>race_raster[[<span class="st">&quot;asian&quot;</span>]] <span class="op">+</span><span class="st"> </span>race_raster[[<span class="st">&quot;pi&quot;</span>]]</a>
+<a class="sourceLine" id="cb1-136" title="136">  race_raster =<span class="st"> </span><span class="kw">dropLayer</span>(race_raster, <span class="kw">c</span>(<span class="st">&quot;am&quot;</span>, <span class="st">&quot;pi&quot;</span>))</a>
+<a class="sourceLine" id="cb1-137" title="137">}</a>
+<a class="sourceLine" id="cb1-138" title="138"></a>
+<a class="sourceLine" id="cb1-139" title="139"><span class="co"># race raster object contains 5 layers: </span></a>
+<a class="sourceLine" id="cb1-140" title="140"><span class="co"># asian, black, hispanic, other, white with subpolulation densities</span></a>
+<a class="sourceLine" id="cb1-141" title="141">race_raster</a>
+<a class="sourceLine" id="cb1-142" title="142"></a>
+<a class="sourceLine" id="cb1-143" title="143"><span class="co"># save race_raster to a rds file</span></a>
+<a class="sourceLine" id="cb1-144" title="144"><span class="kw">saveRDS</span>(race_raster, <span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>, <span class="st">&quot;race_raster.rds&quot;</span>))</a>
+<a class="sourceLine" id="cb1-145" title="145"></a>
+<a class="sourceLine" id="cb1-146" title="146"><span class="co">###################################################################################################</span></a>
+<a class="sourceLine" id="cb1-147" title="147"></a>
+<a class="sourceLine" id="cb1-148" title="148"><span class="co">################################## CONSTRUCTING RACIAL LANDSCAPE ##################################</span></a>
+<a class="sourceLine" id="cb1-149" title="149">real_raster =<span class="st"> </span><span class="kw">create_realizations</span>(race_raster, <span class="dt">n =</span> nrealization)</a>
+<a class="sourceLine" id="cb1-150" title="150"></a>
+<a class="sourceLine" id="cb1-151" title="151"><span class="co"># save real_raster object</span></a>
+<a class="sourceLine" id="cb1-152" title="152"><span class="kw">saveRDS</span>(real_raster, <span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>, <span class="st">&quot;real_rast.rds&quot;</span>))</a>
+<a class="sourceLine" id="cb1-153" title="153"></a>
+<a class="sourceLine" id="cb1-154" title="154"><span class="co"># plot racial landscape</span></a>
+<a class="sourceLine" id="cb1-155" title="155"><span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="st">&quot;racial_landscape.png&quot;</span>)) </a>
+<a class="sourceLine" id="cb1-156" title="156"><span class="kw">plot_realization</span>(<span class="dt">x =</span> real_raster[[<span class="dv">1</span>]], <span class="dt">y =</span> race_raster, <span class="dt">hex =</span> race_colors)</a>
+<a class="sourceLine" id="cb1-157" title="157"><span class="kw">dev.off</span>() </a>
+<a class="sourceLine" id="cb1-158" title="158"><span class="co">###################################################################################################</span></a>
+<a class="sourceLine" id="cb1-159" title="159"></a>
+<a class="sourceLine" id="cb1-160" title="160"><span class="co">################################## CALCULATE RACE-SPECIFIC DENSTITIES #############################</span></a>
+<a class="sourceLine" id="cb1-161" title="161">dens_raster =<span class="st"> </span><span class="kw">create_densities</span>(real_raster, race_raster, <span class="dt">window_size =</span> <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb1-162" title="162"></a>
+<a class="sourceLine" id="cb1-163" title="163"><span class="co"># save dens_raster object</span></a>
+<a class="sourceLine" id="cb1-164" title="164"><span class="kw">saveRDS</span>(dens_raster, <span class="kw">file.path</span>(pf, <span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_data&quot;</span>, <span class="st">&quot;dens_rast.rds&quot;</span>))</a>
+<a class="sourceLine" id="cb1-165" title="165"><span class="co">###################################################################################################</span></a>
+<a class="sourceLine" id="cb1-166" title="166"></a>
+<a class="sourceLine" id="cb1-167" title="167"><span class="co">################################## CALCULATE METRICS FOR DIFFERENT SPATIAL SCALES ################</span></a>
+<a class="sourceLine" id="cb1-168" title="168"></a>
+<a class="sourceLine" id="cb1-169" title="169">complete_smr_df =<span class="st"> </span><span class="kw">data.frame</span>()</a>
+<a class="sourceLine" id="cb1-170" title="170"><span class="cf">for</span> (i <span class="cf">in</span> list_size_shift) { <span class="co">#start size loop</span></a>
+<a class="sourceLine" id="cb1-171" title="171">  size =<span class="st"> </span>i[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb1-172" title="172">  shift =<span class="st"> </span>i[<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb1-173" title="173">  </a>
+<a class="sourceLine" id="cb1-174" title="174">  <span class="co">#######################CALCULATE METRICS FOR SPECIFIED SIZE/SHIFT PARAMETER######################</span></a>
+<a class="sourceLine" id="cb1-175" title="175">  metr_df =<span class="st"> </span><span class="kw">calculate_metrics</span>(real_raster, dens_raster,</a>
+<a class="sourceLine" id="cb1-176" title="176">                              <span class="dt">neighbourhood =</span> <span class="dv">4</span>, <span class="dt">fun =</span> <span class="st">&quot;mean&quot;</span>,</a>
+<a class="sourceLine" id="cb1-177" title="177">                              <span class="dt">size =</span> size, <span class="dt">shift =</span> shift, <span class="dt">threshold =</span> <span class="fl">0.5</span>)</a>
+<a class="sourceLine" id="cb1-178" title="178">  </a>
+<a class="sourceLine" id="cb1-179" title="179">  <span class="co"># Summarize metrics</span></a>
+<a class="sourceLine" id="cb1-180" title="180">  <span class="co">## Number of motifels at given spatial scale</span></a>
+<a class="sourceLine" id="cb1-181" title="181">  sel =<span class="st"> </span>metr_df[<span class="op">!</span><span class="kw">is.na</span>(metr_df<span class="op">$</span>ent), ]</a>
+<a class="sourceLine" id="cb1-182" title="182">  nmotif =<span class="st"> </span><span class="kw">mean</span>(<span class="kw">table</span>(sel<span class="op">$</span>realization))</a>
+<a class="sourceLine" id="cb1-183" title="183">  </a>
+<a class="sourceLine" id="cb1-184" title="184">  <span class="co"># Metrics summary</span></a>
+<a class="sourceLine" id="cb1-185" title="185">  smr =<span class="st"> </span>metr_df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-186" title="186"><span class="st">    </span><span class="kw">group_by</span>(row, col) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-187" title="187"><span class="st">    </span><span class="kw">summarize</span>(</a>
+<a class="sourceLine" id="cb1-188" title="188">      <span class="dt">ent_mean =</span> <span class="kw">mean</span>(ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-189" title="189">      <span class="dt">ent_sd =</span> <span class="kw">sd</span>(ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-190" title="190">      <span class="dt">mutinf_mean =</span> <span class="kw">mean</span>(mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-191" title="191">      <span class="dt">mutinf_sd =</span> <span class="kw">sd</span>(mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-192" title="192">    )</a>
+<a class="sourceLine" id="cb1-193" title="193">  </a>
+<a class="sourceLine" id="cb1-194" title="194">  smr =<span class="st"> </span><span class="kw">as.data.frame</span>(smr)</a>
+<a class="sourceLine" id="cb1-195" title="195"></a>
+<a class="sourceLine" id="cb1-196" title="196">  <span class="co"># Calculate an ensemble average for entropy and mutual information</span></a>
+<a class="sourceLine" id="cb1-197" title="197">  complete_smr =<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb1-198" title="198">    <span class="dt">size =</span> size,</a>
+<a class="sourceLine" id="cb1-199" title="199">    <span class="dt">shift =</span> shift,</a>
+<a class="sourceLine" id="cb1-200" title="200">    <span class="dt">n =</span> nmotif,</a>
+<a class="sourceLine" id="cb1-201" title="201">    <span class="dt">ent =</span> <span class="kw">mean</span>(smr<span class="op">$</span>ent_mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-202" title="202">    <span class="dt">ent_sd =</span> <span class="kw">mean</span>(smr<span class="op">$</span>ent_sd, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-203" title="203">    <span class="dt">mutinf =</span> <span class="kw">mean</span>(smr<span class="op">$</span>mutinf_mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-204" title="204">    <span class="dt">mutinf_sd =</span> <span class="kw">mean</span>(smr<span class="op">$</span>mutinf_sd, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-205" title="205">  )</a>
+<a class="sourceLine" id="cb1-206" title="206">  complete_smr_df =<span class="st"> </span><span class="kw">rbind</span>(complete_smr_df, complete_smr)</a>
+<a class="sourceLine" id="cb1-207" title="207">  </a>
+<a class="sourceLine" id="cb1-208" title="208">  <span class="co"># Calculate racial segregation/diversity classification</span></a>
+<a class="sourceLine" id="cb1-209" title="209">  smr<span class="op">$</span>bivar_cls =<span class="st"> </span><span class="kw">bivariate_classification</span>(<span class="dt">entropy =</span> smr<span class="op">$</span>ent_mean, </a>
+<a class="sourceLine" id="cb1-210" title="210">                                           <span class="dt">mutual_information =</span> smr<span class="op">$</span>mutinf_mean,</a>
+<a class="sourceLine" id="cb1-211" title="211">                                           <span class="dt">n =</span> <span class="kw">nlayers</span>(race_raster))</a>
+<a class="sourceLine" id="cb1-212" title="212">  </a>
+<a class="sourceLine" id="cb1-213" title="213">  <span class="co"># Save the metrics to csv</span></a>
+<a class="sourceLine" id="cb1-214" title="214">  <span class="kw">write.csv</span>(metr_df, </a>
+<a class="sourceLine" id="cb1-215" title="215">            <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_metrics&quot;</span>,</a>
+<a class="sourceLine" id="cb1-216" title="216">                      <span class="kw">paste</span>(<span class="st">&quot;metr_df_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)),</a>
+<a class="sourceLine" id="cb1-217" title="217">            <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-218" title="218">  <span class="kw">write.csv</span>(smr, </a>
+<a class="sourceLine" id="cb1-219" title="219">            <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;out_metrics&quot;</span>, </a>
+<a class="sourceLine" id="cb1-220" title="220">                      <span class="kw">paste</span>(<span class="st">&quot;smr_metr_df_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)),</a>
+<a class="sourceLine" id="cb1-221" title="221">            <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-222" title="222">  </a>
+<a class="sourceLine" id="cb1-223" title="223">  </a>
+<a class="sourceLine" id="cb1-224" title="224">  <span class="co">#######################CREATE SPATIAL OBJECT WITG METRICES######################</span></a>
+<a class="sourceLine" id="cb1-225" title="225">  </a>
+<a class="sourceLine" id="cb1-226" title="226">  <span class="co"># Create spatial object</span></a>
+<a class="sourceLine" id="cb1-227" title="227">  grid_sf =<span class="st"> </span><span class="kw">create_grid</span>(real_raster, <span class="dt">size =</span> size, <span class="dt">shift =</span> shift)</a>
+<a class="sourceLine" id="cb1-228" title="228">  </a>
+<a class="sourceLine" id="cb1-229" title="229">  <span class="co"># Join metrics to the grid</span></a>
+<a class="sourceLine" id="cb1-230" title="230">  attr_grid =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">left_join</span>(grid_sf, smr, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;row&quot;</span>, <span class="st">&quot;col&quot;</span>))</a>
+<a class="sourceLine" id="cb1-231" title="231">  sel_grid =<span class="st"> </span>attr_grid[<span class="op">!</span><span class="kw">is.na</span>(attr_grid<span class="op">$</span>ent_mean),]</a>
+<a class="sourceLine" id="cb1-232" title="232">  </a>
+<a class="sourceLine" id="cb1-233" title="233">  <span class="co"># Save the grid as shapefile</span></a>
+<a class="sourceLine" id="cb1-234" title="234">  <span class="kw">st_write</span>(attr_grid, </a>
+<a class="sourceLine" id="cb1-235" title="235">           <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;shp&quot;</span>, </a>
+<a class="sourceLine" id="cb1-236" title="236">                     <span class="kw">paste</span>(<span class="st">&quot;metr_stat_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.shp&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)))</a>
+<a class="sourceLine" id="cb1-237" title="237">  </a>
+<a class="sourceLine" id="cb1-238" title="238">  <span class="co">#######################VISUALIZATION#########################################</span></a>
+<a class="sourceLine" id="cb1-239" title="239">  </a>
+<a class="sourceLine" id="cb1-240" title="240">  <span class="co"># Divide entropy values into 10 class</span></a>
+<a class="sourceLine" id="cb1-241" title="241">  ent_breaks =<span class="st"> </span><span class="kw">c</span>(<span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dt">by =</span> <span class="fl">0.25</span>), <span class="kw">log2</span>(<span class="kw">nlayers</span>(race_raster)))</a>
+<a class="sourceLine" id="cb1-242" title="242">  </a>
+<a class="sourceLine" id="cb1-243" title="243">  <span class="co"># Divide mutual information into 10 class</span></a>
+<a class="sourceLine" id="cb1-244" title="244">  mut_breaks =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">by =</span> <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb1-245" title="245">  </a>
+<a class="sourceLine" id="cb1-246" title="246">  <span class="co"># Spatial scale in km</span></a>
+<a class="sourceLine" id="cb1-247" title="247">  scale_km =<span class="st"> </span>(shift <span class="op">*</span><span class="st"> </span><span class="kw">res</span>(race_raster)[<span class="dv">1</span>]) <span class="op">/</span><span class="st"> </span><span class="dv">1000</span></a>
+<a class="sourceLine" id="cb1-248" title="248">  </a>
+<a class="sourceLine" id="cb1-249" title="249">  <span class="co"># Mapping racial diversity (save plot to .png)</span></a>
+<a class="sourceLine" id="cb1-250" title="250">  <span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="kw">paste</span>(<span class="st">&quot;diversity_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.png&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) </a>
+<a class="sourceLine" id="cb1-251" title="251">  <span class="kw">plot</span>(sel_grid[<span class="st">&quot;ent_mean&quot;</span>], <span class="dt">breaks =</span> ent_breaks, <span class="dt">key.pos =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-252" title="252">       <span class="dt">pal =</span> <span class="kw">rev</span>(<span class="kw">brewer.pal</span>(<span class="kw">length</span>(ent_breaks) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">name =</span> <span class="st">&quot;RdBu&quot;</span>)), <span class="dt">bty =</span> <span class="st">&quot;n&quot;</span>, </a>
+<a class="sourceLine" id="cb1-253" title="253">       <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;Racial diversity (Entropy) at the scale of &quot;</span>, </a>
+<a class="sourceLine" id="cb1-254" title="254">                    scale_km, <span class="st">&quot; km&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))</a>
+<a class="sourceLine" id="cb1-255" title="255">  <span class="kw">dev.off</span>() </a>
+<a class="sourceLine" id="cb1-256" title="256">  </a>
+<a class="sourceLine" id="cb1-257" title="257">  <span class="co"># Mapping racial segregation (save plot to .png)</span></a>
+<a class="sourceLine" id="cb1-258" title="258">  <span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="kw">paste</span>(<span class="st">&quot;segregation_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.png&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) </a>
+<a class="sourceLine" id="cb1-259" title="259">  <span class="kw">plot</span>(sel_grid[<span class="st">&quot;mutinf_mean&quot;</span>], <span class="dt">breaks =</span> mut_breaks, <span class="dt">key.pos =</span> <span class="dv">1</span>, </a>
+<a class="sourceLine" id="cb1-260" title="260">       <span class="dt">pal =</span> <span class="kw">rev</span>(<span class="kw">brewer.pal</span>(<span class="kw">length</span>(mut_breaks) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">name =</span> <span class="st">&quot;RdBu&quot;</span>)), <span class="dt">bty =</span> <span class="st">&quot;n&quot;</span>, </a>
+<a class="sourceLine" id="cb1-261" title="261">       <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;Racial segregation (Mutual information) at the scale of &quot;</span>,</a>
+<a class="sourceLine" id="cb1-262" title="262">                    scale_km, <span class="st">&quot; km&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))</a>
+<a class="sourceLine" id="cb1-263" title="263">  <span class="kw">dev.off</span>() </a>
+<a class="sourceLine" id="cb1-264" title="264">  </a>
+<a class="sourceLine" id="cb1-265" title="265">  <span class="co"># Mapping racial segregation/diversity (save plot to .png)</span></a>
+<a class="sourceLine" id="cb1-266" title="266">  <span class="kw">png</span>(<span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="kw">paste</span>(<span class="st">&quot;bivar_&quot;</span>, size, <span class="st">&quot;_&quot;</span>, shift, <span class="st">&quot;.png&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)))   </a>
+<a class="sourceLine" id="cb1-267" title="267">  bcat =<span class="st"> </span>bivariate_class_colors[<span class="kw">names</span>(bivariate_class_colors)<span class="op">%in%</span><span class="kw">unique</span>(sel_grid<span class="op">$</span>bivar_cls)]</a>
+<a class="sourceLine" id="cb1-268" title="268">  <span class="kw">plot</span>(sel_grid[<span class="st">&quot;bivar_cls&quot;</span>], </a>
+<a class="sourceLine" id="cb1-269" title="269">       <span class="dt">pal =</span> bcat,</a>
+<a class="sourceLine" id="cb1-270" title="270">       <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;Racial diversity/segregation classification at the scale of &quot;</span>,</a>
+<a class="sourceLine" id="cb1-271" title="271">                     scale_km, <span class="st">&quot; km&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))</a>
+<a class="sourceLine" id="cb1-272" title="272">  <span class="kw">dev.off</span>() </a>
+<a class="sourceLine" id="cb1-273" title="273">} <span class="co">#stop size loop</span></a>
+<a class="sourceLine" id="cb1-274" title="274"></a>
+<a class="sourceLine" id="cb1-275" title="275"></a>
+<a class="sourceLine" id="cb1-276" title="276"><span class="co">###################################################################################################</span></a>
+<a class="sourceLine" id="cb1-277" title="277"></a>
+<a class="sourceLine" id="cb1-278" title="278"><span class="co">################################## CALCULATE METRICS FOR THE WHOLE RACIAL LANDSCAPE ###############</span></a>
+<a class="sourceLine" id="cb1-279" title="279"></a>
+<a class="sourceLine" id="cb1-280" title="280">metr =<span class="st"> </span><span class="kw">calculate_metrics</span>(real_raster, dens_raster,</a>
+<a class="sourceLine" id="cb1-281" title="281">                         <span class="dt">neighbourhood =</span> <span class="dv">4</span>, <span class="dt">fun =</span> <span class="st">&quot;mean&quot;</span>, </a>
+<a class="sourceLine" id="cb1-282" title="282">                         <span class="dt">size =</span> <span class="ot">NULL</span>, <span class="dt">threshold =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb1-283" title="283">complete_smr_all =<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb1-284" title="284">  <span class="dt">size =</span> <span class="st">&quot;ALL&quot;</span>,</a>
+<a class="sourceLine" id="cb1-285" title="285">  <span class="dt">shift =</span> <span class="st">&quot;ALL&quot;</span>,</a>
+<a class="sourceLine" id="cb1-286" title="286">  <span class="dt">n =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb1-287" title="287">  <span class="dt">ent =</span> <span class="kw">mean</span>(metr<span class="op">$</span>ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-288" title="288">  <span class="dt">ent_sd =</span> <span class="kw">sd</span>(metr<span class="op">$</span>ent, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-289" title="289">  <span class="dt">mutinf =</span> <span class="kw">mean</span>(metr<span class="op">$</span>mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
+<a class="sourceLine" id="cb1-290" title="290">  <span class="dt">mutinf_sd =</span> <span class="kw">sd</span>(metr<span class="op">$</span>mutinf, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb1-291" title="291">)</a>
+<a class="sourceLine" id="cb1-292" title="292">complete_smr_df =<span class="st"> </span><span class="kw">rbind</span>(complete_smr_df, complete_smr_all)</a>
+<a class="sourceLine" id="cb1-293" title="293"><span class="kw">colnames</span>(complete_smr_df) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;size&quot;</span>, <span class="st">&quot;shift&quot;</span>, <span class="st">&quot;n&quot;</span>, <span class="st">&quot;ent&quot;</span>, <span class="st">&quot;ent_sd&quot;</span>, <span class="st">&quot;mutinf&quot;</span>, <span class="st">&quot;mutinf_sd&quot;</span>)</a>
+<a class="sourceLine" id="cb1-294" title="294"></a>
+<a class="sourceLine" id="cb1-295" title="295"><span class="co"># Write table with metrices for different spatial scales and for the whole area. </span></a>
+<a class="sourceLine" id="cb1-296" title="296"><span class="kw">write.csv</span>(complete_smr_df,</a>
+<a class="sourceLine" id="cb1-297" title="297">          <span class="kw">file.path</span>(<span class="st">&quot;results&quot;</span>, <span class="st">&quot;final&quot;</span>, <span class="st">&quot;complete_smr.csv&quot;</span>),</a>
+<a class="sourceLine" id="cb1-298" title="298">          <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb1-299" title="299"></a>
+<a class="sourceLine" id="cb1-300" title="300"><span class="co">###################################################################################################</span></a></code></pre></div>
 </div>
 
 

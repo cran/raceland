@@ -11,6 +11,8 @@ status](https://travis-ci.org/Nowosad/raceland.svg?branch=master)](https://travi
 coverage](https://codecov.io/gh/Nowosad/raceland/branch/master/graph/badge.svg)](https://codecov.io/gh/Nowosad/raceland?branch=master)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/raceland)](https://CRAN.R-project.org/package=raceland)
+[![CRAN RStudio mirror
+downloads](http://cranlogs.r-pkg.org/badges/raceland)](https://cran.r-project.org/package=raceland)
 <!-- badges: end -->
 
 The **raceland** package implements a computational framework for a
@@ -30,18 +32,16 @@ the previous methods, does not depend on the division of specific zones
 (entropy) and racial segregation (mutual information) can be performed
 for the whole area of interests (i.e., metropolitan area) without
 introducing any arbitrary divisions. Racial landscape method also allows
-for performing calculations at different spatial
-scales.
+for performing calculations at different spatial scales.
 
 ## Installation
 
-<!-- You can install the released version of raceland from [CRAN](https://CRAN.R-project.org) with: -->
+You can install the released version of raceland from
+[CRAN](https://CRAN.R-project.org) with:
 
-<!-- ``` r -->
-
-<!-- install.packages("raceland") -->
-
-<!-- ``` -->
+``` r
+install.packages("raceland")
+```
 
 You can install the development version from
 [GitHub](https://github.com/) with:
@@ -98,24 +98,24 @@ metr_df = calculate_metrics(x = real_raster, w = dens_raster,
                             size = NULL, threshold = 1)
 head(metr_df)
 #>   realization row col      ent  joinent  condent    mutinf
-#> 1           1   1   1 1.632356 3.162491 1.530134 0.1022222
-#> 2           2   1   1 1.625560 3.147418 1.521858 0.1037016
-#> 3           3   1   1 1.645656 3.168970 1.523314 0.1223416
-#> 4           4   1   1 1.629595 3.137422 1.507827 0.1217680
-#> 5           5   1   1 1.629634 3.154291 1.524657 0.1049766
-#> 6           6   1   1 1.632111 3.161367 1.529256 0.1028558
+#> 1           1   1   1 1.642960 3.172001 1.529041 0.1139193
+#> 2           2   1   1 1.622988 3.126443 1.503456 0.1195318
+#> 3           3   1   1 1.648145 3.193061 1.544916 0.1032296
+#> 4           4   1   1 1.652367 3.198486 1.546119 0.1062475
+#> 5           5   1   1 1.635775 3.152407 1.516632 0.1191429
+#> 6           6   1   1 1.646357 3.187201 1.540844 0.1055126
 ```
 
 ``` r
 # Summarize IT metrics 
 summary(metr_df[, c("ent", "mutinf")])
 #>       ent            mutinf       
-#>  Min.   :1.609   Min.   :0.09362  
-#>  1st Qu.:1.629   1st Qu.:0.10840  
-#>  Median :1.635   Median :0.11323  
-#>  Mean   :1.635   Mean   :0.11436  
-#>  3rd Qu.:1.642   3rd Qu.:0.12042  
-#>  Max.   :1.663   Max.   :0.13610
+#>  Min.   :1.610   Min.   :0.09508  
+#>  1st Qu.:1.627   1st Qu.:0.10456  
+#>  Median :1.634   Median :0.11101  
+#>  Mean   :1.634   Mean   :0.11088  
+#>  3rd Qu.:1.640   3rd Qu.:0.11640  
+#>  Max.   :1.653   Max.   :0.13660
 ```
 
 ## Contribution

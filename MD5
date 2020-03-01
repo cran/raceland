@@ -1,4 +1,4 @@
-eb4713ba41602baea16ea6d29dca15de *DESCRIPTION
+c26bbc1cd8a38d2185c2e3bc7b102aae *DESCRIPTION
 d188f7cd350e38be55cff51795e84766 *LICENSE
 7bf80e458804e38ce13749dfa2eb8604 *NAMESPACE
 7fdf6b4af9bb2cc6952ccf6726cd1aa5 *R/RcppExports.R
@@ -17,13 +17,13 @@ a00c000d85ac1faaa63eb1ed8f5ad5c9 *data/pop_vector.rda
 1f7ea01c51e5e7ad85d2923c1ae8415d *data/race_raster.rda
 f69aeb5f07c4e3145d2933c7ae2bffb2 *inst/doc/raceland-intro1.R
 f54aabe8a92341d62a7d229b37dacb0a *inst/doc/raceland-intro1.Rmd
-c6874e8fea4e3b522c9d65447707543b *inst/doc/raceland-intro1.html
+e182cde24dbe0c035a8282f94ebf7f96 *inst/doc/raceland-intro1.html
 f3c89cb370c8a900d5d1ddddf796371d *inst/doc/raceland-intro2.R
 de5c1228fc7ab350bffc2b4bf2dcfeb8 *inst/doc/raceland-intro2.Rmd
-ea2edebe552e79455572b3b3b83a7ab2 *inst/doc/raceland-intro2.html
+fd98ebafc2181492969c883829440e09 *inst/doc/raceland-intro2.html
 dac4b589f3dbc054d724c5f370123073 *inst/doc/raceland-intro3.R
 2511b4c683d8c5e7c00e86a0952e88e0 *inst/doc/raceland-intro3.Rmd
-ce0455703949a772439f1de724d79cca *inst/doc/raceland-intro3.html
+353b3e9fb814b6df8f99a440453ed7fd *inst/doc/raceland-intro3.html
 a46440806bc50ee932d5e261687cd2ec *inst/rast_data/asian.tif
 df3cdf0ac1359737f96b55833aae3609 *inst/rast_data/black.tif
 58024dfe75014ccad49d59438de084f3 *inst/rast_data/hispanic.tif
@@ -72,7 +72,7 @@ f6b05a2de3aefa7a470768df6c9078dc *tests/testthat/test-densities.R
 8043f61336872bff4dd6ef58bc5b20c7 *tests/testthat/test-metrics.R
 e5250015ce0b73f37e254d5f66c51667 *tests/testthat/test-plot_realization.R
 d5cd7605db8e5530fe27d068a97c430d *tests/testthat/test-realizations.R
-9a1815900a1c87fc289987554b12bb9c *tests/testthat/test-results.R
+0b2ab065334e78a4cbe77422e952cecb *tests/testthat/test-results.R
 f10a7a60f45801daecc11a3a4994dc85 *vignettes/div_seg.png
 d23d4b05b2f253711bb55d53c18c3b3d *vignettes/fig0framework.png
 e79e3f3bcb4f3f47a63a22a74785e0ab *vignettes/fig1adjacencies.png

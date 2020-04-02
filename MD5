@@ -1,4 +1,4 @@
-b037394d827b0d268a5cc1403fa02eec *DESCRIPTION
+db393a35654418efa4c5d7e1366a32e0 *DESCRIPTION
 d188f7cd350e38be55cff51795e84766 *LICENSE
 7bf80e458804e38ce13749dfa2eb8604 *NAMESPACE
 7fdf6b4af9bb2cc6952ccf6726cd1aa5 *R/RcppExports.R
@@ -17,13 +17,13 @@ a00c000d85ac1faaa63eb1ed8f5ad5c9 *data/pop_vector.rda
 1f7ea01c51e5e7ad85d2923c1ae8415d *data/race_raster.rda
 f69aeb5f07c4e3145d2933c7ae2bffb2 *inst/doc/raceland-intro1.R
 f54aabe8a92341d62a7d229b37dacb0a *inst/doc/raceland-intro1.Rmd
-1116d5f335511f33f2af0d0f1da59211 *inst/doc/raceland-intro1.html
-f3c89cb370c8a900d5d1ddddf796371d *inst/doc/raceland-intro2.R
-de5c1228fc7ab350bffc2b4bf2dcfeb8 *inst/doc/raceland-intro2.Rmd
-ec9b05f5b3e66cef32d038f929ec5e74 *inst/doc/raceland-intro2.html
+e3febda1fc05ed0c179a69ad27c0a4fc *inst/doc/raceland-intro1.html
+e647803fde176163dae07369bf5d39ff *inst/doc/raceland-intro2.R
+ea60a72841bf8d5be578aa62b371f6b5 *inst/doc/raceland-intro2.Rmd
+814a656245e861819b10af099e220a31 *inst/doc/raceland-intro2.html
 dac4b589f3dbc054d724c5f370123073 *inst/doc/raceland-intro3.R
 2511b4c683d8c5e7c00e86a0952e88e0 *inst/doc/raceland-intro3.Rmd
-4bbe0d61077bca1c54820fb883187f56 *inst/doc/raceland-intro3.html
+5dfcf61002b8ed3940ad512f5f7059d1 *inst/doc/raceland-intro3.html
 a46440806bc50ee932d5e261687cd2ec *inst/rast_data/asian.tif
 df3cdf0ac1359737f96b55833aae3609 *inst/rast_data/black.tif
 58024dfe75014ccad49d59438de084f3 *inst/rast_data/hispanic.tif
@@ -79,7 +79,8 @@ e79e3f3bcb4f3f47a63a22a74785e0ab *vignettes/fig1adjacencies.png
 3957af6820f36c1ef38e5de1ccb5f373 *vignettes/fig2matrix.png
 223c8efdf983067e595694c7d019f42b *vignettes/fig3size_shift.png
 0d26b24578d044a2a5a516ef958921d4 *vignettes/fig4_bivariate.png
+ba7e3e33189577aa2d3551fc0d86842b *vignettes/raceland-intro.html
 f54aabe8a92341d62a7d229b37dacb0a *vignettes/raceland-intro1.Rmd
-de5c1228fc7ab350bffc2b4bf2dcfeb8 *vignettes/raceland-intro2.Rmd
+ea60a72841bf8d5be578aa62b371f6b5 *vignettes/raceland-intro2.Rmd
 2511b4c683d8c5e7c00e86a0952e88e0 *vignettes/raceland-intro3.Rmd
 45d30fba4e8b0325be6d469f1916c1af *vignettes/racial_landscape.png

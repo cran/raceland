@@ -5,8 +5,8 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.org/Nowosad/raceland.svg?branch=master)](https://travis-ci.org/Nowosad/raceland)
+[![R build
+status](https://github.com/Nowosad/racialscape/workflows/pkgdown/badge.svg)](https://github.com/Nowosad/racialscape/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/Nowosad/raceland/branch/master/graph/badge.svg)](https://codecov.io/gh/Nowosad/raceland?branch=master)
 [![CRAN
@@ -17,14 +17,14 @@ downloads](http://cranlogs.r-pkg.org/badges/raceland)](https://cran.r-project.or
 
 The **raceland** package implements a computational framework for a
 pattern-based, zoneless analysis, and visualization of (ethno)racial
-topography. It is a reimagined approach for analyzing residential
-segregation and racial diversity based on the concept of ‘landscape’
-used in the domain of landscape ecology. A racial landscape, represented
-by a high-resolution raster grid with each cell containing only
-inhabitants of a single race, is quantified by two metrics (entropy and
-mutual information) derived from Information Theory concept (IT).
-Entropy is the measure of racial diversity and mutual information
-measures racial segregation.
+topography (Dmowska et al., 2020). It is a reimagined approach for
+analyzing residential segregation and racial diversity based on the
+concept of ‘landscape’ used in the domain of landscape ecology. A racial
+landscape, represented by a high-resolution raster grid with each cell
+containing only inhabitants of a single race, is quantified by two
+metrics (entropy and mutual information) derived from Information Theory
+concept (IT). Entropy is the measure of racial diversity and mutual
+information measures racial segregation.
 
 Racial landscape method is based on the raster gridded data, and unlike
 the previous methods, does not depend on the division of specific zones
@@ -47,8 +47,8 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("Nowosad/raceland")
+# install.packages("remotes")
+remotes::install_github("Nowosad/raceland")
 ```
 
 ## Example
@@ -98,25 +98,32 @@ metr_df = calculate_metrics(x = real_raster, w = dens_raster,
                             size = NULL, threshold = 1)
 head(metr_df)
 #>   realization row col      ent  joinent  condent    mutinf
-#> 1           1   1   1 1.642960 3.172001 1.529041 0.1139193
-#> 2           2   1   1 1.622988 3.126443 1.503456 0.1195318
-#> 3           3   1   1 1.648145 3.193061 1.544916 0.1032296
-#> 4           4   1   1 1.652367 3.198486 1.546119 0.1062475
-#> 5           5   1   1 1.635775 3.152407 1.516632 0.1191429
-#> 6           6   1   1 1.646357 3.187201 1.540844 0.1055126
+#> 1           1   1   1 1.613048 3.098844 1.485796 0.1272523
+#> 2           2   1   1 1.632398 3.142268 1.509870 0.1225279
+#> 3           3   1   1 1.647741 3.164575 1.516834 0.1309073
+#> 4           4   1   1 1.642894 3.160951 1.518057 0.1248368
+#> 5           5   1   1 1.627609 3.136853 1.509244 0.1183651
+#> 6           6   1   1 1.630362 3.144456 1.514094 0.1162672
 ```
 
 ``` r
 # Summarize IT metrics 
 summary(metr_df[, c("ent", "mutinf")])
 #>       ent            mutinf       
-#>  Min.   :1.610   Min.   :0.09508  
-#>  1st Qu.:1.627   1st Qu.:0.10456  
-#>  Median :1.634   Median :0.11101  
-#>  Mean   :1.634   Mean   :0.11088  
-#>  3rd Qu.:1.640   3rd Qu.:0.11640  
-#>  Max.   :1.653   Max.   :0.13660
+#>  Min.   :1.611   Min.   :0.09491  
+#>  1st Qu.:1.628   1st Qu.:0.10914  
+#>  Median :1.635   Median :0.11422  
+#>  Mean   :1.634   Mean   :0.11421  
+#>  3rd Qu.:1.639   3rd Qu.:0.12085  
+#>  Max.   :1.650   Max.   :0.13091
 ```
+
+## References
+
+  - Dmowska, A., Stepinski T., Nowosad J. Racial landscapes – a
+    pattern-based, zoneless method for analysis and visualization of
+    racial topography. Applied Geography. 122:1-9,
+    <http://dx.doi.org/10.1016/j.apgeog.2020.102239>
 
 ## Contribution
 

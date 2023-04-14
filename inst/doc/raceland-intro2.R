@@ -1,4 +1,5 @@
 ## ---- include = FALSE---------------------------------------------------------
+options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -11,11 +12,9 @@ knitr::opts_chunk$set(
 #  pkgs = c(
 #    "raceland",
 #    "comat",
-#    "rgdal",
-#    "raster",
+#    "terra",
 #    "sf",
-#    "dplyr",
-#    "RColorBrewer"
+#    "dplyr"
 #  )
 #  to_install = !pkgs %in% installed.packages()
 #  if(any(to_install)) {
@@ -24,7 +23,7 @@ knitr::opts_chunk$set(
 
 ## ---- warning=FALSE, message=FALSE, include=FALSE-----------------------------
 library(raceland)
-library(raster)
+library(terra)
 library(sf)
 library(dplyr)
 
@@ -32,7 +31,7 @@ library(dplyr)
 # reading input data
 list_raster = list.files(system.file("rast_data", package = "raceland"),
                          full.names = TRUE)
-race_raster = stack(list_raster)
+race_raster = rast(list_raster)
 
 # constructing racial landscape
 real_raster = create_realizations(x = race_raster, n = 100)
@@ -98,7 +97,7 @@ bivariate_classification = function(entropy, mutual_information, n) {
 ## -----------------------------------------------------------------------------
 smr$bivar_cls = bivariate_classification(entropy = smr$ent_mean, 
                                          mutual_information = smr$mutinf_mean,
-                                         n = nlayers(race_raster))
+                                         n = nlyr(race_raster))
 
 ## -----------------------------------------------------------------------------
 # join IT-metric to the grid
@@ -107,19 +106,17 @@ attr_grid = dplyr::left_join(grid_sf, smr, by = c("row", "col"))
 ## -----------------------------------------------------------------------------
 # calculate breaks parameter for plotting entropy and mutual information
 # the values of entropy and mutual information are divided into equal breaks
-ent_breaks = c(seq(0, 2, by = 0.25), log2(nlayers(race_raster)))
+ent_breaks = c(seq(0, 2, by = 0.25), log2(nlyr(race_raster)))
 mut_breaks = seq(0, 1, by = 0.1)
 
 ## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
 plot(attr_grid["ent_mean"], breaks = ent_breaks, key.pos = 1, 
-     pal = rev(RColorBrewer::brewer.pal(length(ent_breaks) - 1, name = "RdBu")),
-     # pal = grDevices::hcl.colors(length(ent_breaks) - 1, palette = "Blue-Red"),
+     pal = rev(hcl.colors(length(ent_breaks) - 1, palette = "RdBu")),
      bty = "n", main = "Racial diversity (Entropy)")
 
 ## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
 plot(attr_grid["mutinf_mean"], breaks = mut_breaks, key.pos = 1, 
-     pal = rev(RColorBrewer::brewer.pal(length(mut_breaks) - 1, name = "RdBu")),
-     # pal = grDevices::hcl.colors(length(mut_breaks) - 1, palette = "Blue-Red"),
+     pal = rev(hcl.colors(length(mut_breaks) - 1, palette = "RdBu")),
      bty = "n", main = "Racial segregation (Mutual information)")
 
 ## ---- fig.align = "center"----------------------------------------------------
@@ -153,7 +150,7 @@ smr10 %>%
 smr10$bivar_cls = bivariate_classification(
   entropy = smr10$ent_mean,
   mutual_information = smr10$mutinf_mean,
-  n = nlayers(race_raster)
+  n = nlyr(race_raster)
 )
 
 ## -----------------------------------------------------------------------------
@@ -165,14 +162,13 @@ attr_grid10 = dplyr::left_join(grid_sf10, smr10, by = c("row", "col"))
 
 ## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
 plot(attr_grid10["ent_mean"], breaks = ent_breaks, key.pos = 1, 
-     pal = rev(RColorBrewer::brewer.pal(length(ent_breaks) - 1, name = "RdBu")),
+     pal = rev(hcl.colors(length(ent_breaks) - 1, palette = "RdBu")),
      # pal = grDevices::hcl.colors(length(ent_breaks) - 1, palette = "Blue-Red"),
      bty = "n", main = "Racial diversity (Entropy)")
 
 ## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
 plot(attr_grid10["mutinf_mean"], breaks = mut_breaks, key.pos = 1,
-     pal = rev(RColorBrewer::brewer.pal(length(mut_breaks) - 1, name = "RdBu")),
-     # pal = grDevices::hcl.colors(length(mut_breaks) - 1, palette = "Blue-Red"),
+     pal = rev(hcl.colors(length(mut_breaks) - 1, palette = "RdBu")),
      bty = "n", main = "Racial segregation (Mutual information)")
 
 ## ---- fig.align = "center"----------------------------------------------------

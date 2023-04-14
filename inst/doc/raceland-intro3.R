@@ -1,4 +1,5 @@
 ## ---- include = FALSE---------------------------------------------------------
+options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -29,11 +30,9 @@ knitr::include_graphics("div_seg.png")
 #  pkgs = c(
 #    "raceland",
 #    "comat",
-#    "rgdal",
-#    "raster",
+#    "terra",
 #    "sf",
-#    "dplyr",
-#    "RColorBrewer"
+#    "dplyr"
 #  )
 #  to_install = !pkgs %in% installed.packages()
 #  if(any(to_install)) {
@@ -42,10 +41,9 @@ knitr::include_graphics("div_seg.png")
 #  
 #  # REQUIRED R-PACKAGES
 #  library(raceland)
-#  library(raster)
+#  library(terra)
 #  library(sf)
 #  library(dplyr)
-#  library(RColorBrewer)
 #  
 #  # SET WORKING DIRECTORY
 #  ## setwd("")
@@ -127,9 +125,9 @@ knitr::include_graphics("div_seg.png")
 #  ###################################################################################################
 #  
 #  ################################## PREPROCESS RACE-SPECIFIC DATA ##################################
-#  # Read data from GeoTIFFs to a RasterStack object
+#  # Read data from GeoTIFFs to a SpatRaster object
 #  list_raster = list.files(pf_to_data, pattern = sfx, full.names = TRUE)
-#  race_raster = stack(list_raster)
+#  race_raster = rast(list_raster)
 #  
 #  # Rename raster layers
 #  rnames = sapply(strsplit(names(race_raster), "_"), tail, 1)
@@ -147,18 +145,18 @@ knitr::include_graphics("div_seg.png")
 #  )
 #  names(race_raster) = new_names
 #  
-#  # Reorder layers in RasterStack
+#  # Reorder layers in SpatRaster
 #  race_raster = subset(race_raster, c("asian", "am", "black", "hispanic", "other", "pi", "white"))
 #  
 #  # Combine race-specific categories (ASIAN=ASIAN+PI, OTHER=OTHER+AM).
 #  # Please notice that pi category does not exist for 1990myc dataset.
 #  if (sfx == "1990myc") {
 #    race_raster[["other"]] = race_raster[["other"]] + race_raster[["am"]]
-#    race_raster = dropLayer(race_raster, c("am"))
+#    race_raster = subset(race_raster, c("asian", "black", "hispanic", "other", "pi", "white"))
 #  } else {
 #    race_raster[["other"]] = race_raster[["other"]] + race_raster[["am"]]
 #    race_raster[["asian"]] = race_raster[["asian"]] + race_raster[["pi"]]
-#    race_raster = dropLayer(race_raster, c("am", "pi"))
+#    race_raster = subset(race_raster, c("asian", "black", "hispanic", "other", "white"))
 #  }
 #  
 #  # race raster object contains 5 layers:
@@ -274,7 +272,7 @@ knitr::include_graphics("div_seg.png")
 #    # Mapping racial diversity (save plot to .png)
 #    png(file.path("results", "final", paste("diversity_", size, "_", shift, ".png", sep = "")))
 #    plot(sel_grid["ent_mean"], breaks = ent_breaks, key.pos = 1,
-#         pal = rev(brewer.pal(length(ent_breaks) - 1, name = "RdBu")), bty = "n",
+#         pal = rev(hcl.colors(length(ent_breaks) - 1, palette = "RdBu")), bty = "n",
 #         main = paste("Racial diversity (Entropy) at the scale of ",
 #                      scale_km, " km", sep = ""))
 #    dev.off()
@@ -282,7 +280,7 @@ knitr::include_graphics("div_seg.png")
 #    # Mapping racial segregation (save plot to .png)
 #    png(file.path("results", "final", paste("segregation_", size, "_", shift, ".png", sep = "")))
 #    plot(sel_grid["mutinf_mean"], breaks = mut_breaks, key.pos = 1,
-#         pal = rev(brewer.pal(length(mut_breaks) - 1, name = "RdBu")), bty = "n",
+#         pal = rev(hcl.colors(length(mut_breaks) - 1, palette = "RdBu")), bty = "n",
 #         main = paste("Racial segregation (Mutual information) at the scale of ",
 #                      scale_km, " km", sep = ""))
 #    dev.off()

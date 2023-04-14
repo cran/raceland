@@ -1,4 +1,5 @@
 ## ---- include = FALSE---------------------------------------------------------
+options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -14,8 +15,7 @@ knitr::include_graphics("fig0framework.png")
 #  pkgs = c(
 #    "raceland",
 #    "comat",
-#    "rgdal",
-#    "raster",
+#    "terra",
 #    "sf",
 #    "dplyr"
 #  )
@@ -27,7 +27,7 @@ knitr::include_graphics("fig0framework.png")
 ## ---- warning=FALSE, message=FALSE, include=FALSE-----------------------------
 # attach required packages
 library(raceland)
-library(raster)
+library(terra)
 library(sf)
 library(dplyr)
 
@@ -36,7 +36,7 @@ list_raster = list.files(system.file("rast_data", package = "raceland"),
                          full.names = TRUE)
 
 ## -----------------------------------------------------------------------------
-race_raster = stack(list_raster)
+race_raster = rast(list_raster)
 race_raster
 
 ## ----fig1, fig.align = "center", out.width = '80%'----------------------------
@@ -80,8 +80,8 @@ knitr::include_graphics("fig2matrix.png")
 dens_raster = create_densities(real_raster, race_raster, window_size = 10)
 
 ## -----------------------------------------------------------------------------
-exposure_mat = comat::get_wecoma(x = as.matrix(real_raster[[1]]), 
-                                 w = as.matrix(dens_raster[[1]]))
+exposure_mat = comat::get_wecoma(x = as.matrix(real_raster[[1]], wide = TRUE), 
+                                 w = as.matrix(dens_raster[[1]], wide = TRUE))
 colnames(exposure_mat) = c("ASIAN", "BLACK", "HISPANIC", "OTHER", "WHITE")
 rownames(exposure_mat) = c("ASIAN", "BLACK", "HISPANIC", "OTHER", "WHITE")
 round(exposure_mat, 2)

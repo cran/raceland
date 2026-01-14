@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -7,24 +7,24 @@ knitr::opts_chunk$set(
   fig.width = 6
 )
 
-## ---- echo=FALSE, out.width=800-----------------------------------------------
+## ----echo=FALSE, out.width=800------------------------------------------------
 knitr::include_graphics("fig0framework.png")
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  # install required packages
-#  pkgs = c(
-#    "raceland",
-#    "comat",
-#    "terra",
-#    "sf",
-#    "dplyr"
-#  )
-#  to_install = !pkgs %in% installed.packages()
-#  if(any(to_install)) {
-#    install.packages(pkgs[to_install])
-#  }
+## ----eval=FALSE---------------------------------------------------------------
+# # install required packages
+# pkgs = c(
+#   "raceland",
+#   "comat",
+#   "terra",
+#   "sf",
+#   "dplyr"
+# )
+# to_install = !pkgs %in% installed.packages()
+# if(any(to_install)) {
+#   install.packages(pkgs[to_install])
+# }
 
-## ---- warning=FALSE, message=FALSE, include=FALSE-----------------------------
+## ----warning=FALSE, message=FALSE, include=FALSE------------------------------
 # attach required packages
 library(raceland)
 library(terra)
@@ -45,13 +45,13 @@ plot(race_raster)
 ## -----------------------------------------------------------------------------
 pf_to_data = system.file("vect_data/block_data.gpkg", package = "raceland")
 
-## ---- warning=FALSE, message=FALSE--------------------------------------------
+## ----warning=FALSE, message=FALSE---------------------------------------------
 vect_data = st_read(pf_to_data)
 
 ## -----------------------------------------------------------------------------
 names(vect_data)
 
-## ---- warning=FALSE, message=FALSE--------------------------------------------
+## ----warning=FALSE, message=FALSE---------------------------------------------
 race_raster_from_vect = zones_to_raster(v = vect_data,
                                         resolution = 30, 
                                         variables = c("ASIAN", "BLACK", "HISPANIC", "OTHER", "WHITE"))
@@ -60,20 +60,20 @@ race_raster_from_vect = zones_to_raster(v = vect_data,
 # generate 100 realizations based on race_raster object
 real_raster = create_realizations(x = race_raster, n = 100)
 
-## ---- fig2, fig.align = "center", out.width = '100%'--------------------------
+## ----fig2, fig.align = "center", out.width = '100%'---------------------------
 # plot five first realizations
 plot(real_raster[[1:5]], col = c("#F16667", "#6EBE44", "#7E69AF", "#C77213", "#F8DF1D"))
 
-## ---- fig3, fig.align = "center", out.width = '40%'---------------------------
+## ----fig3, fig.align = "center", out.width = '40%'----------------------------
 # In race_colors first color corresponds to asian, second to black,
 # third to hispanics, fourth to other and fifth to white)
 race_colors = c("#F16667", "#6EBE44", "#7E69AF", "#C77213", "#F8DF1D")
 plot_realization(x = real_raster[[1]], y = race_raster, hex = race_colors)
 
-## ---- echo=FALSE, out.width = '100%'------------------------------------------
+## ----echo=FALSE, out.width = '100%'-------------------------------------------
 knitr::include_graphics("fig1adjacencies.png")
 
-## ---- echo=FALSE, out.width = '100%'------------------------------------------
+## ----echo=FALSE, out.width = '100%'-------------------------------------------
 knitr::include_graphics("fig2matrix.png")
 
 ## -----------------------------------------------------------------------------

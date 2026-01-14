@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -7,21 +7,21 @@ knitr::opts_chunk$set(
   fig.width = 6
 )
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  # install required packages
-#  pkgs = c(
-#    "raceland",
-#    "comat",
-#    "terra",
-#    "sf",
-#    "dplyr"
-#  )
-#  to_install = !pkgs %in% installed.packages()
-#  if(any(to_install)) {
-#    install.packages(pkgs[to_install])
-#  }
+## ----eval=FALSE---------------------------------------------------------------
+# # install required packages
+# pkgs = c(
+#   "raceland",
+#   "comat",
+#   "terra",
+#   "sf",
+#   "dplyr"
+# )
+# to_install = !pkgs %in% installed.packages()
+# if(any(to_install)) {
+#   install.packages(pkgs[to_install])
+# }
 
-## ---- warning=FALSE, message=FALSE, include=FALSE-----------------------------
+## ----warning=FALSE, message=FALSE, include=FALSE------------------------------
 library(raceland)
 library(terra)
 library(sf)
@@ -39,10 +39,10 @@ real_raster = create_realizations(x = race_raster, n = 100)
 # calculating local subpopulation densities
 dens_raster = create_densities(real_raster, race_raster, window_size = 10)
 
-## ---- echo=FALSE, out.width = '100%'------------------------------------------
+## ----echo=FALSE, out.width = '100%'-------------------------------------------
 knitr::include_graphics("fig3size_shift.png")
 
-## ---- fig5, fig.align = "center", out.width = '40%'---------------------------
+## ----fig5, fig.align = "center", out.width = '40%'----------------------------
 race_colors = c("#F16667", "#6EBE44", "#7E69AF", "#C77213", "#F8DF1D")
 grid_sf = create_grid(real_raster, size = 20)
 plot_realization(real_raster[[1]], race_raster, hex = race_colors)
@@ -71,7 +71,7 @@ smr %>%
   select(-row, -col) %>% 
   summarise_all(mean)
 
-## ---- echo=FALSE, out.width = '40%'-------------------------------------------
+## ----echo=FALSE, out.width = '40%'--------------------------------------------
 knitr::include_graphics("fig4_bivariate.png")
 
 ## -----------------------------------------------------------------------------
@@ -109,17 +109,17 @@ attr_grid = dplyr::left_join(grid_sf, smr, by = c("row", "col"))
 ent_breaks = c(seq(0, 2, by = 0.25), log2(nlyr(race_raster)))
 mut_breaks = seq(0, 1, by = 0.1)
 
-## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
+## ----warning=FALSE, message=FALSE, fig.align = "center"-----------------------
 plot(attr_grid["ent_mean"], breaks = ent_breaks, key.pos = 1, 
      pal = rev(hcl.colors(length(ent_breaks) - 1, palette = "RdBu")),
      bty = "n", main = "Racial diversity (Entropy)")
 
-## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
+## ----warning=FALSE, message=FALSE, fig.align = "center"-----------------------
 plot(attr_grid["mutinf_mean"], breaks = mut_breaks, key.pos = 1, 
      pal = rev(hcl.colors(length(mut_breaks) - 1, palette = "RdBu")),
      bty = "n", main = "Racial segregation (Mutual information)")
 
-## ---- fig.align = "center"----------------------------------------------------
+## ----fig.align = "center"-----------------------------------------------------
 biv_colors = c("11" = "#e8e8e8", "12" = "#e4acac", "13" = "#c85a5a", "21" = "#b0d5df",
                "22" = "#ad9ea5", "23" = "#985356", "31" = "#64acbe", "32"= "#627f8c", 
                "33" = "#574249")
@@ -160,18 +160,18 @@ grid_sf10 = create_grid(real_raster, size = 20, shift = 10)
 # join IT-metrics to the grid
 attr_grid10 = dplyr::left_join(grid_sf10, smr10, by = c("row", "col"))
 
-## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
+## ----warning=FALSE, message=FALSE, fig.align = "center"-----------------------
 plot(attr_grid10["ent_mean"], breaks = ent_breaks, key.pos = 1, 
      pal = rev(hcl.colors(length(ent_breaks) - 1, palette = "RdBu")),
      # pal = grDevices::hcl.colors(length(ent_breaks) - 1, palette = "Blue-Red"),
      bty = "n", main = "Racial diversity (Entropy)")
 
-## ---- warning=FALSE, message=FALSE, fig.align = "center"----------------------
+## ----warning=FALSE, message=FALSE, fig.align = "center"-----------------------
 plot(attr_grid10["mutinf_mean"], breaks = mut_breaks, key.pos = 1,
      pal = rev(hcl.colors(length(mut_breaks) - 1, palette = "RdBu")),
      bty = "n", main = "Racial segregation (Mutual information)")
 
-## ---- fig.align = "center"----------------------------------------------------
+## ----fig.align = "center"-----------------------------------------------------
 # `biv_color`s defines a bivariate palette, 
 # `bcat` selects only colors for categories available for analyzed areas
 biv_colors = c("11" = "#e8e8e8", "12" = "#e4acac", "13" = "#c85a5a", "21" = "#b0d5df", 
